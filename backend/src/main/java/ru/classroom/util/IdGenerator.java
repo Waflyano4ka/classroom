@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 
 @Component
 public class IdGenerator {
+
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789";
     private static final int PART_LENGTH = 5;
     private static final int PARTS_COUNT = 3;

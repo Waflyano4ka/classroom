@@ -31,6 +31,11 @@ public class UserCredentials {
     protected UserCredentials() {
     }
 
+    public UserCredentials(String userId, String passwordHash) {
+        this.userId = userId;
+        this.passwordHash = passwordHash;
+    }
+
     public String getUserId() {
         return userId;
     }

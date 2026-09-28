@@ -48,6 +48,21 @@ public class User {
     private OffsetDateTime updatedAt;
 
     protected User() {
+
+    }
+
+    public User(
+            String id,
+            String username,
+            String email,
+            AccountStatus accountStatus,
+            AuthProvider authProvider
+    ) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.accountStatus = accountStatus;
+        this.authProvider = authProvider;
     }
 
     public String getId() {
