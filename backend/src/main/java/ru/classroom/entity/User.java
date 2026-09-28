@@ -1,5 +1,6 @@
 package ru.classroom.entity;
 
+import org.hibernate.annotations.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -41,10 +42,12 @@ public class User {
     @JoinColumn(name = "auth_provider_id", nullable = false)
     private AuthProvider authProvider;
 
-    @Column(name = "created_at", nullable = false)
+    @Generated
+    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Generated
+    @Column(name = "updated_at", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime updatedAt;
 
     protected User() {

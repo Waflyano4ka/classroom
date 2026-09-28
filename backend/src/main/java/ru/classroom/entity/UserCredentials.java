@@ -1,5 +1,6 @@
 package ru.classroom.entity;
 
+import org.hibernate.annotations.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,7 +26,8 @@ public class UserCredentials {
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
-    @Column(name = "updated_at", nullable = false)
+    @Generated
+    @Column(name = "updated_at", nullable = false, insertable = false)
     private OffsetDateTime updatedAt;
 
     protected UserCredentials() {
