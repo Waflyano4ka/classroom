@@ -2,5 +2,13 @@ spring:
   application:
     name: backend
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  jpa:
+    open-in-view: false
+
 app:
   frontend-url: http://localhost:5173
