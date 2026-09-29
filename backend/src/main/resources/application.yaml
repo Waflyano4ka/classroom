@@ -13,6 +13,10 @@ spring:
 app:
   frontend-url: http://localhost:5173
 
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: 10m
+
 logging:
   level:
     org.springframework.security: DEBUG

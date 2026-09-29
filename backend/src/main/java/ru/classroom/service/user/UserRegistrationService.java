@@ -1,9 +1,9 @@
-package ru.classroom.service;
+package ru.classroom.service.user;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.classroom.dto.RegisterUserRequest;
+import ru.classroom.dto.LocalRegisterUserRequest;
 import ru.classroom.entity.AccountStatus;
 import ru.classroom.entity.AuthProvider;
 import ru.classroom.entity.User;
@@ -15,31 +15,31 @@ import ru.classroom.repository.UserRepository;
 import ru.classroom.util.IdGenerator;
 
 @Service
-public class UserService {
+public class UserRegistrationService {
 
     private static final String USER_ID_PREFIX = "user-";
     private static final String ACTIVE_UNVERIFIED_STATUS = "ACTIVE_UNVERIFIED";
     private static final String LOCAL_AUTH_PROVIDER = "LOCAL";
 
-    private final UserRepository userRepository;
-    private final UserCredentialsRepository userCredentialsRepository;
     private final AccountStatusRepository accountStatusRepository;
     private final AuthProviderRepository authProviderRepository;
+    private final UserCredentialsRepository userCredentialsRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final IdGenerator idGenerator;
 
-    public UserService(
-            UserRepository userRepository,
-            UserCredentialsRepository userCredentialsRepository,
+    public UserRegistrationService(
             AccountStatusRepository accountStatusRepository,
             AuthProviderRepository authProviderRepository,
+            UserCredentialsRepository userCredentialsRepository,
+            UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             IdGenerator idGenerator
     ) {
-        this.userRepository = userRepository;
-        this.userCredentialsRepository = userCredentialsRepository;
         this.accountStatusRepository = accountStatusRepository;
         this.authProviderRepository = authProviderRepository;
+        this.userCredentialsRepository = userCredentialsRepository;
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.idGenerator = idGenerator;
     }
@@ -50,7 +50,7 @@ public class UserService {
      * @param request данные для регистрации пользователя
      */
     @Transactional
-    public void localRegister(RegisterUserRequest request) {
+    public void localRegister(LocalRegisterUserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username уже занят");
         }
@@ -96,7 +96,6 @@ public class UserService {
      */
     private String generateUserId() {
         String userId;
-
         do {
             userId = USER_ID_PREFIX + idGenerator.generate();
         } while (userRepository.existsById(userId));

@@ -6,9 +6,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import ru.classroom.config.jwt.JwtAuthenticationFilter;
+import ru.classroom.config.jwt.JwtService;
 
 import java.util.List;
 
@@ -16,9 +19,14 @@ import java.util.List;
 public class SecurityConfig {
 
     private final String frontendUrl;
+    private final JwtService jwtService;
 
-    public SecurityConfig(@Value("${app.frontend-url}") String frontendUrl) {
+    public SecurityConfig(
+            @Value("${app.frontend-url}") String frontendUrl,
+            JwtService jwtService
+    ) {
         this.frontendUrl = frontendUrl;
+        this.jwtService = jwtService;
     }
 
     @Bean
@@ -28,7 +36,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register").permitAll()
+                        //todo Единый обработчик ошибок
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
+                )
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(jwtService),
+                        UsernamePasswordAuthenticationFilter.class
                 );
 
         return http.build();
