@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import PublicLayout from '@/layouts/PublicLayout.vue'
-import HomePage from '@/pages/HomePage.vue'
+import WelcomePage from '@/pages/WelcomePage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,8 +12,8 @@ const router = createRouter({
       children: [
         {
           path: '',
-          name: 'home',
-          component: HomePage,
+          name: 'welcome',
+          component: WelcomePage,
         },
       ],
     },

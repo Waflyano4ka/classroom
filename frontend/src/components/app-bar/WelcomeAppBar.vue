@@ -2,6 +2,7 @@
   <v-app-bar
     color="primary"
     class="px-2"
+    elevation="0"
   >
     <app-logo class="text-none"/>
 
