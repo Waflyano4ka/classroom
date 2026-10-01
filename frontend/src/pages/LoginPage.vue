@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+
+import { requiredRule } from "@/utils/validation.ts";
 
 const visiblePassword = ref(false)
-const router = useRouter()
+const password = ref('')
+const login = ref('')
 </script>
 
 <template>
@@ -19,6 +21,7 @@ const router = useRouter()
         variant="outlined"
         rounded="lg"
         class="mb-2"
+        :rules="[requiredRule]"
       />
 
       <v-text-field
@@ -26,7 +29,8 @@ const router = useRouter()
         :type="visiblePassword ? 'text' : 'password'"
         variant="outlined"
         rounded="lg"
-        class="mb-2"
+        class="mb-8"
+        :rules="[requiredRule]"
         :append-inner-icon="visiblePassword ? 'mdi-eye-off' : 'mdi-eye'"
         @click:append-inner="visiblePassword = !visiblePassword"
       />
@@ -38,19 +42,26 @@ const router = useRouter()
           size="large"
           rounded="lg"
           class="text-darkprimary font-weight-bold text-none flex-grow-1 order-1 order-sm-2"
+          type="submit"
         >
           Войти
         </v-btn>
 
-        <v-btn
-          variant="outlined"
-          size="large"
-          rounded="lg"
-          class="text-none font-weight-bold order-2 order-sm-1"
-          @click="router.back()"
+        <router-link
+          :to="{ name: 'welcome' }"
+          custom
+          v-slot="{ navigate }"
         >
-          Назад
-        </v-btn>
+          <v-btn
+            variant="outlined"
+            size="large"
+            rounded="lg"
+            class="text-none font-weight-bold order-2 order-sm-1"
+            @click="navigate"
+          >
+            Назад
+          </v-btn>
+        </router-link>
       </div>
     </v-form>
   </div>

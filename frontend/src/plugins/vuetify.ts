@@ -10,6 +10,7 @@ export default createVuetify({
       light: {
         colors: {
           background: '#fffbe6',
+          accentbackground: '#d6ba88',
           darkprimary: '#29463e',
           primary: '#356859',
         },
