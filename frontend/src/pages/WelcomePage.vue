@@ -12,18 +12,45 @@
     </p>
 
     <div class="d-flex flex-column flex-sm-row justify-center ga-4 mt-6 px-6 px-sm-0 font-weight-bold">
-      <v-btn size="x-large" color="background" variant="tonal">
-        Регистрация
-      </v-btn>
+      <router-link
+        :to="{ name: 'register' }"
+        custom
+        v-slot="{ navigate }"
+      >
+        <v-btn size="x-large"
+               color="background"
+               variant="tonal"
+               class="login-button"
+               @click="navigate"
+        >
+          Зарегистрироваться
+        </v-btn>
+      </router-link>
 
-      <v-btn size="x-large" color="background" variant="flat" class="text-darkprimary font-weight-bold">
-        Авторизоваться
-      </v-btn>
+      <router-link
+        :to="{ name: 'login' }"
+        custom
+        v-slot="{ navigate }"
+      >
+        <v-btn
+          size="x-large"
+          color="background"
+          variant="flat"
+          class="text-darkprimary font-weight-bold login-button"
+          @click="navigate"
+        >
+          Авторизоваться
+        </v-btn>
+      </router-link>
     </div>
   </div>
 </template>
 
 <style scoped>
+.login-button {
+  font-size: 20px;
+}
+
 .welcome-title {
   font-weight: 700;
 }
@@ -34,7 +61,6 @@
   margin-right: auto;
 }
 
-/* Планшет и выше */
 @media (min-width: 960px) {
   .welcome-title {
     font-size: 3.5rem !important; /* ~56px */
@@ -45,7 +71,6 @@
   }
 }
 
-/* Большой экран */
 @media (min-width: 1280px) {
   .welcome-title {
     font-size: 3.5rem !important; /* ~72px */

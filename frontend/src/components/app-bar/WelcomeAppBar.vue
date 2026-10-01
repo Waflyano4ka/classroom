@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+import AppLogo from '@/components/app-bar/AppLogo.vue'
+
+const route = useRoute()
+</script>
+
 <template>
   <v-app-bar
     color="primary"
@@ -8,22 +15,26 @@
 
     <v-spacer />
 
-    <v-btn
-      class="text-none login-button"
-      color="background"
-      size="large"
-      append-icon="mdi-login"
-      rounded="lg"
-      variant="tonal"
+    <router-link
+      v-if="route.name !== 'login'"
+      :to="{ name: 'login' }"
+      custom
+      v-slot="{ navigate }"
     >
-      Войти
-    </v-btn>
+      <v-btn
+        class="text-none login-button"
+        color="background"
+        size="large"
+        append-icon="mdi-login"
+        rounded="lg"
+        variant="tonal"
+        @click="navigate"
+      >
+        Войти
+      </v-btn>
+    </router-link>
   </v-app-bar>
 </template>
-
-<script setup lang="ts">
-import AppLogo from '@/components/app-bar/AppLogo.vue'
-</script>
 
 <style scoped>
 .login-button {
