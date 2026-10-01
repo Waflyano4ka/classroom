@@ -10,11 +10,7 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-    vuetify({
-      styles: {
-        configFile: 'src/styles/settings.scss', // ← путь к файлу
-      },
-    }),
+    vuetify(),
   ],
   resolve: {
     alias: {
