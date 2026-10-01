@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+
 import AppLogo from '@/components/app-bar/AppLogo.vue'
 
 const route = useRoute()
