@@ -53,11 +53,11 @@ public class UserRegistrationService {
     @Transactional
     public void localRegister(LocalRegisterUserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new ConflictException("Username уже занят");
+            throw new ConflictException("Логин уже занят");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ConflictException("Этот email уже зарегистрирован");
+            throw new ConflictException("Эта почта уже зарегистрирована");
         }
 
         AccountStatus accountStatus = accountStatusRepository

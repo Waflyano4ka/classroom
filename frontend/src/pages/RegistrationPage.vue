@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { API_PATHS } from '@/constants/apiPaths'
+import axios from 'axios'
 import api from '@/services/api'
+
+import type { VForm } from 'vuetify/components'
 
 import UserAgreementDialog from '@/components/dialogs/UserAgreementDialog.vue'
 
@@ -20,17 +23,24 @@ const visibleRePassword = ref(false)
 const agreementDialog = ref(false)
 
 const password = ref('')
+const passwordConfirmation = ref('')
 const username = ref('')
 const email = ref('')
 const agreed = ref(false)
 
 const isLoading = ref(false)
-//todo Добавить окно с ошибками
-const errorMessage = ref('')
 
 const router = useRouter()
+const form = ref<VForm | null>(null)
+type SnackbarType = 'success' | 'error' | 'warning' | 'info'
+const showSnackbar = inject<
+  (message: string, type?: SnackbarType) => void
+>('showSnackbar')
+
 const register = async () => {
-  errorMessage.value = ''
+  const { valid } = await form.value!.validate()
+  if (!valid) return
+
   isLoading.value = true
 
   try {
@@ -39,10 +49,17 @@ const register = async () => {
       username: username.value,
       password: password.value,
     })
-
+    
     await router.push({ name: 'login' })
-  } catch {
-    errorMessage.value = 'Не удалось зарегистрироваться'
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      showSnackbar?.(
+        error.response?.data?.message ?? 'Не удалось зарегистрироваться',
+        'error'
+      )
+    } else {
+      showSnackbar?.('Не удалось зарегистрироваться', 'error')
+    }
   } finally {
     isLoading.value = false
   }
@@ -55,7 +72,7 @@ const register = async () => {
       Регистрация
     </h1>
 
-    <v-form @submit.prevent="register">
+    <v-form ref="form" @submit.prevent="register">
       <v-text-field
         v-model="email"
         label="Почта"
@@ -88,6 +105,7 @@ const register = async () => {
       />
 
       <v-text-field
+        v-model="passwordConfirmation"
         label="Подтверждение пароля"
         :type="visibleRePassword ? 'text' : 'password'"
         variant="outlined"

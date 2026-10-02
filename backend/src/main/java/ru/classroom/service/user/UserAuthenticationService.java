@@ -45,7 +45,6 @@ public class UserAuthenticationService extends UserService {
             UserCredentials credentials = userCredentialsRepository
                     .findById(user.getId())
                     .orElseThrow(() -> new IllegalStateException(
-                            //todo Привести к единому виду ошибок (Сделать окно с вопросами к поддержке)
                             "У пользователя отсутствуют данные для аутентификации"
                     ));
 
