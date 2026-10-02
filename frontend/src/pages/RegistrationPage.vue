@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { API_PATHS } from '@/constants/apiPaths'
+import api from '@/services/api'
 
 import UserAgreementDialog from '@/components/dialogs/UserAgreementDialog.vue'
 
@@ -17,13 +20,33 @@ const visibleRePassword = ref(false)
 const agreementDialog = ref(false)
 
 const password = ref('')
-const login = ref('')
+const username = ref('')
 const email = ref('')
 const agreed = ref(false)
 
 const isLoading = ref(false)
 //todo Добавить окно с ошибками
 const errorMessage = ref('')
+
+const router = useRouter()
+const register = async () => {
+  errorMessage.value = ''
+  isLoading.value = true
+
+  try {
+    await api.post(API_PATHS.AUTH.REGISTER, {
+      email: email.value,
+      username: username.value,
+      password: password.value,
+    })
+
+    await router.push({ name: 'login' })
+  } catch {
+    errorMessage.value = 'Не удалось зарегистрироваться'
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -32,7 +55,7 @@ const errorMessage = ref('')
       Регистрация
     </h1>
 
-    <v-form>
+    <v-form @submit.prevent="register">
       <v-text-field
         v-model="email"
         label="Почта"
@@ -44,7 +67,7 @@ const errorMessage = ref('')
       />
 
       <v-text-field
-        v-model="login"
+        v-model="username"
         label="Логин"
         variant="outlined"
         rounded="lg"

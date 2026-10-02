@@ -5,7 +5,7 @@ import { requiredRule } from "@/utils/validation.ts";
 
 const visiblePassword = ref(false)
 const password = ref('')
-const login = ref('')
+const username = ref('')
 </script>
 
 <template>
