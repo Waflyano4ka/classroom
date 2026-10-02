@@ -8,6 +8,7 @@ import ru.classroom.entity.AccountStatus;
 import ru.classroom.entity.AuthProvider;
 import ru.classroom.entity.User;
 import ru.classroom.entity.UserCredentials;
+import ru.classroom.exception.ConflictException;
 import ru.classroom.repository.AccountStatusRepository;
 import ru.classroom.repository.AuthProviderRepository;
 import ru.classroom.repository.UserCredentialsRepository;
@@ -52,11 +53,11 @@ public class UserRegistrationService {
     @Transactional
     public void localRegister(LocalRegisterUserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username уже занят");
+            throw new ConflictException("Username уже занят");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email уже занят");
+            throw new ConflictException("Этот email уже зарегистрирован");
         }
 
         AccountStatus accountStatus = accountStatusRepository
