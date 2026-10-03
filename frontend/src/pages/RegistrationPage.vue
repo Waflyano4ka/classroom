@@ -2,10 +2,12 @@
 import { inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { API_PATHS } from '@/constants/apiPaths'
+import { MESSAGES } from '@/constants/messages'
 import axios from 'axios'
 import api from '@/services/api'
 
 import type { VForm } from 'vuetify/components'
+import type { SnackbarType } from '@/types/snackbar.ts'
 
 import UserAgreementDialog from '@/components/dialogs/UserAgreementDialog.vue'
 
@@ -32,7 +34,6 @@ const isLoading = ref(false)
 
 const router = useRouter()
 const form = ref<VForm | null>(null)
-type SnackbarType = 'success' | 'error' | 'warning' | 'info'
 const showSnackbar = inject<
   (message: string, type?: SnackbarType) => void
 >('showSnackbar')
@@ -49,16 +50,17 @@ const register = async () => {
       username: username.value,
       password: password.value,
     })
-    
+
+    showSnackbar?.(MESSAGES.AUTH.REGISTER_SUCCESS, 'success')
     await router.push({ name: 'login' })
   } catch (error) {
     if (axios.isAxiosError(error)) {
       showSnackbar?.(
-        error.response?.data?.message ?? 'Не удалось зарегистрироваться',
+        error.response?.data?.message ?? MESSAGES.AUTH.REGISTER_ERROR,
         'error'
       )
     } else {
-      showSnackbar?.('Не удалось зарегистрироваться', 'error')
+      showSnackbar?.(MESSAGES.AUTH.REGISTER_ERROR, 'error')
     }
   } finally {
     isLoading.value = false

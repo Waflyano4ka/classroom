@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { provide, ref } from 'vue'
-
-type SnackbarType = 'success' | 'error' | 'warning' | 'info' | 'default'
+import type { SnackbarType } from '@/types/snackbar.ts'
 
 interface SnackbarMessage {
   text: string

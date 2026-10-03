@@ -1,5 +1,7 @@
 <script setup lang="ts">
+
 </script>
+
 <template>
   <div class="text-center text-background">
     <h1 class="welcome-title text-h5 text-sm-h2 mb-0">

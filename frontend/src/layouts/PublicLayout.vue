@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import WelcomeAppBar from '@/components/app-bar/WelcomeAppBar.vue'
+</script>
+
 <template>
   <welcome-app-bar />
 
@@ -17,10 +21,6 @@
     </v-container>
   </v-main>
 </template>
-
-<script setup lang="ts">
-import WelcomeAppBar from '@/components/app-bar/WelcomeAppBar.vue'
-</script>
 
 <style scoped>
 .desc-border {

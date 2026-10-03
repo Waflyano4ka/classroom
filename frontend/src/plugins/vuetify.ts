@@ -13,6 +13,7 @@ export default createVuetify({
           accentbackground: '#d6ba88',
           darkprimary: '#29463e',
           primary: '#356859',
+          logout: '#ffa0a0'
         },
       },
     },

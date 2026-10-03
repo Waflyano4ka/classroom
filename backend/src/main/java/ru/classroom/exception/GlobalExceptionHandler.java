@@ -14,6 +14,37 @@ public class GlobalExceptionHandler {
     //todo Разобраться с логированием
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleValidationException(MethodArgumentNotValidException exception) {
+        log.error("Некорректные данные, ошибка валидации dto", exception);
+
+        return new ApiError(
+                "ERR-400-001",
+                "Некорректные данные"
+        );
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleInvalidCredentialsException(
+            InvalidCredentialsException exception
+    ) {
+        return new ApiError(
+                "ERR-401-001",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleConflictException(ConflictException exception) {
+        return new ApiError(
+                "ERR-409-001",
+                exception.getMessage()
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleException(Exception exception) {
@@ -33,26 +64,6 @@ public class GlobalExceptionHandler {
         return new ApiError(
                 "ERR-500-002",
                 "Внутренняя ошибка сервера"
-        );
-    }
-
-    @ExceptionHandler(ConflictException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleConflictException(ConflictException exception) {
-        return new ApiError(
-                "ERR-409-001",
-                exception.getMessage()
-        );
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleValidationException(MethodArgumentNotValidException exception) {
-        log.error("Некорректные данные, ошибка валидации dto", exception);
-
-        return new ApiError(
-                "ERR-400-001",
-                "Некорректные данные"
         );
     }
 }

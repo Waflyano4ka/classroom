@@ -7,6 +7,7 @@ import ru.classroom.dto.LocalLoginUserRequest;
 import ru.classroom.dto.LocalLoginUserResponse;
 import ru.classroom.entity.User;
 import ru.classroom.entity.UserCredentials;
+import ru.classroom.exception.InvalidCredentialsException;
 import ru.classroom.repository.UserCredentialsRepository;
 import ru.classroom.repository.UserRepository;
 
@@ -57,6 +58,6 @@ public class UserAuthenticationService extends UserService {
             }
         }
 
-        throw new IllegalArgumentException("Неверный логин или пароль");
+        throw new InvalidCredentialsException("Неверный логин или пароль");
     }
 }
