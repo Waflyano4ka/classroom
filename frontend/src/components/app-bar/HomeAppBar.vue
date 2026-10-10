@@ -3,9 +3,12 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 import AppLogo from '@/components/app-bar/AppLogo.vue'
+import AccountDialog from "@/components/dialogs/AccountDialog.vue";
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+//todo подсказка при наведении
 
 const logout = async () => {
   authStore.clearToken()
@@ -23,14 +26,18 @@ const logout = async () => {
 
     <v-spacer />
 
-    <v-btn
-      class="text-none logout-button"
-      color="logout"
-      icon="mdi-logout"
-      rounded="lg"
-      variant="tonal"
-      @click="logout"
-    />
+    <template v-slot:append>
+      <account-dialog/>
+
+      <v-btn
+        class="text-none logout-button"
+        color="logout"
+        icon="mdi-logout"
+        rounded="lg"
+        variant="tonal"
+        @click="logout"
+      />
+    </template>
   </v-app-bar>
 </template>
 
