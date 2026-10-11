@@ -3,6 +3,7 @@ package ru.classroom.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -27,11 +28,27 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ApiError handleInvalidCredentialsException(
-            InvalidCredentialsException exception
-    ) {
+    public ApiError handleInvalidCredentialsException(InvalidCredentialsException exception) {
         return new ApiError(
-                "ERR-401-001",
+                "ERR-401-003",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleUserNotFoundException(UserNotFoundException exception) {
+        return new ApiError(
+                "ERR-401-004",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleAuthenticationCredentialsNotFoundException(AuthenticationCredentialsNotFoundException exception) {
+        return new ApiError(
+                "ERR-401-005",
                 exception.getMessage()
         );
     }

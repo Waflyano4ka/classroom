@@ -49,6 +49,9 @@ public class UserRegistrationService {
      * Регистрирует пользователя с использованием локальной аутентификации.
      * При регистрации создаются пользователь и его учётные данные.
      * @param request данные для регистрации пользователя
+     * @throws ConflictException если логин уже занят или электронная почта уже зарегистрирована
+     * @throws IllegalStateException если не удалось получить необходимый статус учётной записи
+     * или провайдера аутентификации
      */
     @Transactional
     public void localRegister(LocalRegisterUserRequest request) {
