@@ -1,5 +1,6 @@
 package ru.classroom.config.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.jspecify.annotations.Nullable;
@@ -14,6 +15,10 @@ import java.util.Date;
 @Service
 public class JwtService {
 
+    private static final String TOKEN_TYPE_CLAIM = "type";
+    private static final String ACCESS_TOKEN_TYPE = "access";
+    private static final String REFRESH_TOKEN_TYPE = "refresh";
+
     private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
 
@@ -26,36 +31,93 @@ public class JwtService {
     }
 
     /**
-     * Создаёт JWT-токен для указанного пользователя.
+     * Создаёт access token для указанного пользователя
      * @param userId идентификатор пользователя
-     * @return подписанный JWT-токен
+     * @return подписанный access token
      */
-    public String generateToken(String userId) {
+    public String generateAccessToken(String userId) {
+        return generateToken(userId, ACCESS_TOKEN_TYPE, jwtProperties.expiration());
+    }
+
+    /**
+     * Создаёт refresh token для указанного пользователя
+     * @param userId идентификатор пользователя
+     * @return подписанный refresh token
+     */
+    public String generateRefreshToken(String userId) {
+        return generateToken(userId, REFRESH_TOKEN_TYPE, jwtProperties.refreshExpiration());
+    }
+
+    /**
+     * Создаёт подписанный JWT с идентификатором пользователя, типом токена
+     * и сроком действия.
+     *
+     * @param userId идентификатор пользователя, для которого создаётся токен
+     * @param tokenType тип токена, например access или refresh
+     * @param expiration срок действия токена
+     * @return подписанный JWT в виде строки
+     */
+    private String generateToken(
+            String userId,
+            String tokenType,
+            java.time.Duration expiration
+    ) {
         Instant now = Instant.now();
-        Instant expiration = now.plus(jwtProperties.expiration());
+        Instant expiresAt = now.plus(expiration);
 
         return Jwts.builder()
                 .subject(userId)
+                .claim(TOKEN_TYPE_CLAIM, tokenType)
                 .issuedAt(Date.from(now))
-                .expiration(Date.from(expiration))
+                .expiration(Date.from(expiresAt))
                 .signWith(secretKey)
                 .compact();
     }
 
     /**
-     * Проверяет JWT-токен и извлекает из него идентификатор пользователя.
+     * Проверяет access token и извлекает идентификатор пользователя.
      * @param token JWT-токен
      * @return идентификатор пользователя или {@code null}, если токен недействителен
      */
     @Nullable
-    public String getUserId(String token) {
+    public String getUserIdFromAccessToken(String token) {
+        return getUserId(token, ACCESS_TOKEN_TYPE);
+    }
+
+    /**
+     * Проверяет refresh token и извлекает идентификатор пользователя.
+     *
+     * @param token JWT-токен
+     * @return идентификатор пользователя или {@code null}, если токен недействителен
+     */
+    @Nullable
+    public String getUserIdFromRefreshToken(String token) {
+        return getUserId(token, REFRESH_TOKEN_TYPE);
+    }
+
+    /**
+     * Извлекает идентификатор пользователя из JWT после проверки подписи,
+     * срока действия и типа токена.
+     *
+     * @param token JWT, из которого необходимо получить идентификатор пользователя
+     * @param expectedType ожидаемый тип токена, например access или refresh
+     * @return идентификатор пользователя, если токен действителен и его тип совпадает
+     * с ожидаемым; {@code null} в противном случае
+     */
+    @Nullable
+    private String getUserId(String token, String expectedType) {
         try {
-            return Jwts.parser()
+            Claims claims = Jwts.parser()
                     .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token)
-                    .getPayload()
-                    .getSubject();
+                    .getPayload();
+
+            if (!expectedType.equals(claims.get(TOKEN_TYPE_CLAIM, String.class))) {
+                return null;
+            }
+
+            return claims.getSubject();
         } catch (JwtException | IllegalArgumentException e) {
             return null;
         }

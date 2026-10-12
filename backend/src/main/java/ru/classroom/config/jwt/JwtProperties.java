@@ -10,6 +10,10 @@ import java.time.Duration;
  * @param expiration срок действия JWT-токена
  */
 @ConfigurationProperties(prefix = "app.jwt")
-public record JwtProperties(String secret, Duration expiration) {
+public record JwtProperties(
+        String secret,
+        Duration expiration,
+        Duration refreshExpiration
+) {
     // https://javarush.com/groups/posts/4126-kofe-breyk-230-chto-takoe-zapisi-records-v-java-i-kak-oni-rabotajut
 }

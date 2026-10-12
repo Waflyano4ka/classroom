@@ -1,11 +1,15 @@
-import axios from 'axios'
+import axios, { type InternalAxiosRequestConfig } from 'axios'
+import { API_BASE_URL } from '@/constants/apiPaths'
+import { getAccessToken } from '../types/accessToken.ts'
+import { setupAuthInterceptors } from './authInterceptor'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: API_BASE_URL,
+  withCredentials: true,
 })
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken')
+  const token = getAccessToken()
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
@@ -13,5 +17,7 @@ api.interceptors.request.use((config) => {
 
   return config
 })
+
+setupAuthInterceptors(api)
 
 export default api

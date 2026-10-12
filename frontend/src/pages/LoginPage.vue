@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { setAccessToken } from '@/types/accessToken'
 import { useRouter } from 'vue-router'
 import { API_PATHS } from '@/constants/apiPaths'
 import { MESSAGES } from '@/constants/messages'
@@ -20,7 +20,6 @@ const login = ref('')
 const isLoading = ref(false)
 
 const router = useRouter()
-const authStore = useAuthStore()
 const form = ref<VForm | null>(null)
 const showSnackbar = inject<
   (message: string, type?: SnackbarType) => void
@@ -41,7 +40,7 @@ const authorization = async () => {
       },
     )
 
-    authStore.setToken(response.data.token)
+    setAccessToken(response.data.token)
     showSnackbar?.(MESSAGES.AUTH.LOGIN_SUCCESS, 'success')
     await router.push({ name: 'home' })
   } catch (error) {

@@ -1,13 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { getAccessToken } from '@/types/accessToken'
+import { initializeAuth } from '@/services/authInitialization'
 
 import PublicLayout from '@/layouts/PublicLayout.vue'
-import HomeLayout from "@/layouts/HomeLayout.vue";
+import HomeLayout from '@/layouts/HomeLayout.vue'
 
 import WelcomePage from '@/pages/WelcomePage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
 import RegistrationPage from '@/pages/RegistrationPage.vue'
-import HomePage from "@/pages/HomePage.vue";
+import HomePage from '@/pages/HomePage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,9 +54,7 @@ const router = createRouter({
     {
       path: '/:pathMatch(.*)*',
       redirect: () => {
-        const authStore = useAuthStore()
-
-        return authStore.token
+        return getAccessToken()
           ? { name: 'home' }
           : { name: 'welcome' }
       },
@@ -63,9 +62,18 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to) => {
-  const authStore = useAuthStore()
-  const isAuthenticated = !!authStore.token
+let authInitialized = false
+let authInitializationPromise: Promise<void> | null = null
+
+router.beforeEach(async (to) => {
+  if (!authInitialized) {
+    authInitializationPromise ??= initializeAuth()
+
+    await authInitializationPromise
+    authInitialized = true
+  }
+
+  const isAuthenticated = !!getAccessToken()
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     return { name: 'login' }

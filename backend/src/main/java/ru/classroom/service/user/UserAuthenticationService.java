@@ -1,8 +1,11 @@
 package ru.classroom.service.user;
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.classroom.config.jwt.JwtService;
+import ru.classroom.dto.LocalLoginResult;
 import ru.classroom.dto.LocalLoginUserRequest;
 import ru.classroom.dto.LocalLoginUserResponse;
 import ru.classroom.entity.User;
@@ -39,7 +42,7 @@ public class UserAuthenticationService extends UserService {
      * @throws IllegalArgumentException если пользователь не найден или указан неверный пароль
      * @throws IllegalStateException если для пользователя отсутствуют данные для аутентификации
      */
-    public LocalLoginUserResponse localLogin(LocalLoginUserRequest request) {
+    public LocalLoginResult localLogin(LocalLoginUserRequest request, HttpServletResponse response) {
         User user = findUserByLoginOrEmail(request.getLogin());
 
         if (user != null) {
@@ -53,11 +56,36 @@ public class UserAuthenticationService extends UserService {
                     request.getPassword(),
                     credentials.getPasswordHash()
             )) {
-                String token = jwtService.generateToken(user.getId());
-                return new LocalLoginUserResponse(token);
+                String accessToken = jwtService.generateAccessToken(user.getId());
+                return new LocalLoginResult(
+                        user.getId(),
+                        new LocalLoginUserResponse(accessToken)
+                );
             }
         }
 
         throw new InvalidCredentialsException("Неверный логин или пароль");
+    }
+
+    /**
+     * Обновляет access-токен на основании refresh-токена.
+     * Проверяет наличие и действительность refresh-токена, а также существование
+     * пользователя, после чего генерирует новый access-токен.
+     * @param refreshToken refresh-токен пользователя
+     * @return новый access-токен, если refresh-токен действителен и пользователь существует;
+     * {@code null} в противном случае
+     */
+    @Nullable
+    public String refreshAccessToken(String refreshToken) {
+        if (refreshToken == null) {
+            return null;
+        }
+
+        String userId = jwtService.getUserIdFromRefreshToken(refreshToken);
+        if (userId == null || !userRepository.existsById(userId)) {
+            return null;
+        }
+
+        return jwtService.generateAccessToken(userId);
     }
 }

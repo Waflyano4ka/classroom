@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+
+import { logoutUser } from '@/services/auth.ts'
 
 import AppLogo from '@/components/app-bar/AppLogo.vue'
 import AccountDialog from "@/components/dialogs/AccountDialog.vue";
 
 const router = useRouter()
-const authStore = useAuthStore()
 
 //todo подсказка при наведении
 
 const logout = async () => {
-  authStore.clearToken()
+  await logoutUser()
   await router.push({ name: 'welcome' })
 }
 </script>

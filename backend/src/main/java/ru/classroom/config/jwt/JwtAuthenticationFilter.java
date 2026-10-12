@@ -35,7 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * Проверяет JWT-токен из заголовка Authorization и устанавливает
      * аутентифицированного пользователя в контекст Spring Security.
      * <a href="https://habr.com/ru/articles/784508/">...</a>
-     *
      * @param request HTTP-запрос
      * @param response HTTP-ответ
      * @param filterChain цепочка фильтров Spring Security
@@ -52,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorization = request.getHeader(AUTHORIZATION_HEADER);
         if (authorization != null && authorization.startsWith(BEARER_PREFIX)) {
             String token = authorization.substring(BEARER_PREFIX.length());
-            String userId = jwtService.getUserId(token);
+            String userId = jwtService.getUserIdFromAccessToken(token);
 
             if (userId == null) {
                 writeUnauthorizedResponse(response);
@@ -72,9 +71,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void writeUnauthorizedResponse(
-            HttpServletResponse response
-    ) throws IOException {
+    /**
+     * Формирует HTTP-ответ с кодом 401 Unauthorized для неавторизованного запроса
+     * и очищает текущий контекст безопасности.
+     * @param response HTTP-ответ, в который записываются статус и JSON с описанием ошибки
+     * @throws IOException если при записи тела ответа произошла ошибка ввода-вывода
+     */
+    private void writeUnauthorizedResponse(HttpServletResponse response) throws IOException {
         SecurityContextHolder.clearContext();
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());

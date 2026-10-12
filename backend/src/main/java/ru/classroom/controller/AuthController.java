@@ -1,11 +1,15 @@
 package ru.classroom.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.classroom.dto.LocalLoginResult;
 import ru.classroom.dto.LocalLoginUserRequest;
 import ru.classroom.dto.LocalLoginUserResponse;
 import ru.classroom.dto.LocalRegisterUserRequest;
+import ru.classroom.service.user.RefreshTokenCookieService;
 import ru.classroom.service.user.UserAuthenticationService;
 import ru.classroom.service.user.UserRegistrationService;
 
@@ -15,13 +19,16 @@ public class AuthController {
 
     private final UserRegistrationService userRegistrationService;
     private final UserAuthenticationService userAuthenticationService;
+    private final RefreshTokenCookieService refreshTokenCookieService;
 
     public AuthController(
             UserRegistrationService userRegistrationService,
-            UserAuthenticationService userAuthenticationService
+            UserAuthenticationService userAuthenticationService,
+            RefreshTokenCookieService refreshTokenCookieService
     ) {
         this.userRegistrationService = userRegistrationService;
         this.userAuthenticationService = userAuthenticationService;
+        this.refreshTokenCookieService = refreshTokenCookieService;
     }
 
     /**
@@ -40,7 +47,43 @@ public class AuthController {
      * @return ответ с JWT-токеном
      */
     @PostMapping("/login")
-    public LocalLoginUserResponse localLogin(@Valid @RequestBody LocalLoginUserRequest request) {
-        return userAuthenticationService.localLogin(request);
+    public LocalLoginUserResponse localLogin(@Valid @RequestBody LocalLoginUserRequest request, HttpServletResponse response) {
+        LocalLoginResult result = userAuthenticationService.localLogin(request, response);
+        refreshTokenCookieService.setRefreshTokenCookie(result.getUserId(), response);
+
+        return result.getLocalLoginUserResponse();
+    }
+
+    /**
+     * Завершает пользовательскую сессию, удаляя refresh-токен из cookie.
+     * @param response HTTP-ответ, в который записывается удаление cookie
+     */
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(HttpServletResponse response) {
+        refreshTokenCookieService.clearRefreshTokenCookie(response);
+    }
+
+    /**
+     * Обновляет access-токен на основании refresh-токена из cookie.
+     *
+     * @param refreshToken refresh-токен из cookie; может отсутствовать
+     * @param response HTTP-ответ, используемый для удаления недействительной cookie
+     * @return новый access-токен при успешном обновлении или сообщение об ошибке,
+     * если refresh-токен отсутствует, недействителен или истёк
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<LocalLoginUserResponse> refresh(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse response
+    ) {
+        String accessToken = userAuthenticationService.refreshAccessToken(refreshToken);
+
+        if (accessToken == null) {
+            refreshTokenCookieService.clearRefreshTokenCookie(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); //todo Что-то придумать для ответа пользователю
+        }
+
+        return ResponseEntity.ok(new LocalLoginUserResponse(accessToken));
     }
 }
