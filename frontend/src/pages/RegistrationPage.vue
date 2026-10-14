@@ -7,7 +7,7 @@ import axios from 'axios'
 import api from '@/services/api'
 
 import type { VForm } from 'vuetify/components'
-import type { SnackbarType } from '@/types/snackbar.ts'
+import type { SnackbarType } from '@/types/Snackbar.ts'
 
 import UserAgreementDialog from '@/components/dialogs/UserAgreementDialog.vue'
 

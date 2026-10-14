@@ -5,6 +5,9 @@ export const API_PATHS = {
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
   },
+  USERS: {
+    ME: '/users/me',
+  },
 } as const
 
 export const API_BASE_URL = 'http://localhost:8080/api'

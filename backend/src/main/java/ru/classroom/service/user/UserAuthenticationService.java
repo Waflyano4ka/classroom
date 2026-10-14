@@ -81,6 +81,7 @@ public class UserAuthenticationService extends UserService {
             return null;
         }
 
+        // todo: Проверять refresh-токен по записи в БД и поддержать отзыв токенов.
         String userId = jwtService.getUserIdFromRefreshToken(refreshToken);
         if (userId == null || !userRepository.existsById(userId)) {
             return null;

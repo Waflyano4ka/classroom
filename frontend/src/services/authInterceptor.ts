@@ -11,9 +11,9 @@ import {
 } from '@/constants/apiPaths'
 
 
-import { setAccessToken } from '../types/accessToken'
+import { setAccessToken } from '../types/AccessToken.ts'
 import { logoutUser } from './auth.ts'
-import type { LoginResponse } from '@/types/auth'
+import type { LoginResponse } from '@/types/Auth.ts'
 
 interface RetryableRequest extends InternalAxiosRequestConfig {
   _retry?: boolean
@@ -22,6 +22,7 @@ interface RetryableRequest extends InternalAxiosRequestConfig {
 const refreshApi = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
+  timeout: 300_000,
 })
 
 let refreshPromise: Promise<string> | null = null

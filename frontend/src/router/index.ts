@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getAccessToken } from '@/types/accessToken'
+import { getAccessToken } from '@/types/AccessToken.ts'
 import { initializeAuth } from '@/services/authInitialization'
 
 import PublicLayout from '@/layouts/PublicLayout.vue'

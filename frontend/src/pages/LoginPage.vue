@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue'
-import { setAccessToken } from '@/types/accessToken'
+import { setAccessToken } from '@/types/AccessToken.ts'
 import { useRouter } from 'vue-router'
+import { getErrorMessage } from '@/utils/getErrorMessage'
+import { useCurrentUserStore } from '@/stores/currentUser'
 import { API_PATHS } from '@/constants/apiPaths'
 import { MESSAGES } from '@/constants/messages'
 import axios from "axios"
 import api from '@/services/api'
 
-import type {VForm} from "vuetify/components"
-import type { SnackbarType } from '@/types/snackbar.ts'
-import type { LoginResponse } from '@/types/auth'
+import type { VForm } from "vuetify/components"
+import type { SnackbarType } from '@/types/Snackbar.ts'
+import type { LoginResponse } from '@/types/Auth.ts'
 
 import { requiredRule } from "@/utils/validation.ts"
 
@@ -20,6 +22,7 @@ const login = ref('')
 const isLoading = ref(false)
 
 const router = useRouter()
+const currentUserStore = useCurrentUserStore()
 const form = ref<VForm | null>(null)
 const showSnackbar = inject<
   (message: string, type?: SnackbarType) => void
@@ -32,26 +35,42 @@ const authorization = async () => {
   isLoading.value = true
 
   try {
-    const response = await api.post<LoginResponse>(
-      API_PATHS.AUTH.LOGIN,
-      {
-        login: login.value,
-        password: password.value,
-      },
-    )
+    // Авторизация
+    let response: { data: LoginResponse }
+
+    try {
+      response = await api.post<LoginResponse>(
+        API_PATHS.AUTH.LOGIN,
+        {
+          login: login.value,
+          password: password.value,
+        },
+      )
+    } catch (error) {
+      showSnackbar?.(
+        getErrorMessage(error, MESSAGES.AUTH.LOGIN_ERROR),
+        'error',
+      )
+
+      return
+    }
 
     setAccessToken(response.data.token)
+
+    // Загрузка данных пользователя
+    try {
+      await currentUserStore.fetchCurrentUser()
+    } catch (error) {
+      currentUserStore.clearCurrentUser()
+
+      showSnackbar?.(
+        getErrorMessage(error, MESSAGES.USER.LOAD_ERROR),
+        'error',
+      )
+    }
+
     showSnackbar?.(MESSAGES.AUTH.LOGIN_SUCCESS, 'success')
     await router.push({ name: 'home' })
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      showSnackbar?.(
-        error.response?.data?.message ?? MESSAGES.AUTH.LOGIN_ERROR,
-        'error'
-      )
-    } else {
-      showSnackbar?.(MESSAGES.AUTH.LOGIN_ERROR, 'error')
-    }
   } finally {
     isLoading.value = false
   }
