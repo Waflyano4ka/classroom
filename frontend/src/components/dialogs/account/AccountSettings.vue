@@ -21,7 +21,7 @@ const { user } = storeToRefs(useCurrentUserStore())
 <template>
   <div class="account-settings d-flex flex-column h-100">
     <div class="flex-grow-1 overflow-y-auto px-2 pt-2 thin-scroll">
-      <div class="profile-layout mb-6">
+      <div class="profile-layout mb-1">
         <!-- Аватар: на мобильном сверху, на большом справа -->
         <v-avatar size="216" color="primary" class="profile-avatar">
           <!-- todo сделать возможность отображения аватара -->
@@ -37,8 +37,7 @@ const { user } = storeToRefs(useCurrentUserStore())
             base-color="darkprimary"
             rounded="lg"
             readonly
-            hide-details
-            class="mb-6"
+            class="mb-1"
           />
 
           <v-text-field
@@ -49,8 +48,7 @@ const { user } = storeToRefs(useCurrentUserStore())
             base-color="darkprimary"
             rounded="lg"
             readonly
-            hide-details
-            class="mb-6"
+            class="mb-1"
           />
 
           <v-text-field
@@ -61,7 +59,6 @@ const { user } = storeToRefs(useCurrentUserStore())
             base-color="darkprimary"
             rounded="lg"
             readonly
-            hide-details
           />
         </div>
       </div>
@@ -73,8 +70,7 @@ const { user } = storeToRefs(useCurrentUserStore())
         base-color="darkprimary"
         rounded="lg"
         readonly
-        hide-details
-        class="mb-6"
+        class="mb-1"
       />
       <v-text-field
         :model-value="user?.email"

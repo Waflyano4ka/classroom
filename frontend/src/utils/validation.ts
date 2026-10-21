@@ -55,3 +55,20 @@ export const emailRule = (value: string) =>
 // Пользовательское соглашение
 export const agreementRule = (value: boolean) =>
   value || 'Необходимо согласиться с условиями пользовательского соглашения'
+
+// ФИО
+export const nameRule = (value: string) => {
+  if (!value?.trim()) {
+    return true
+  }
+
+  if (value.length > 100) {
+    return 'Не более 100 символов'
+  }
+
+  if (!/^[а-яА-ЯёЁa-zA-Z\s-]+$/.test(value)) {
+    return 'Только буквы, пробел и дефис'
+  }
+
+  return true
+}
