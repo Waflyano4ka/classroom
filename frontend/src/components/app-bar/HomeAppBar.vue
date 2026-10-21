@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { logoutUser } from '@/services/auth.ts'
 
 import AppLogo from '@/components/app-bar/AppLogo.vue'
-import AccountDialog from "@/components/dialogs/AccountDialog.vue";
+import AccountDialog from "@/components/dialogs/account/AccountDialog.vue";
 
 const router = useRouter()
 
