@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, shallowRef, markRaw, computed } from 'vue'
+import { storeToRefs } from "pinia";
 import { useCurrentUserStore } from '@/stores/currentUser.ts'
 import { useCurrentUserUpdateStore } from "@/stores/currentUserUpdate.ts";
 
@@ -9,7 +10,7 @@ import SecuritySettings from './SecuritySettings.vue'
 
 const updateStore = useCurrentUserUpdateStore()
 const currentUserStore = useCurrentUserStore()
-const { isLoading } = currentUserStore
+const { isLoading } = storeToRefs(currentUserStore)
 
 const dialog = shallowRef(false)
 const isEditingAccount = ref(false)

@@ -12,6 +12,7 @@ import ru.classroom.dto.LocalLoginUserRequest;
 import ru.classroom.dto.LocalLoginUserResponse;
 import ru.classroom.entity.User;
 import ru.classroom.entity.UserCredentials;
+import ru.classroom.exception.ConflictException;
 import ru.classroom.exception.InvalidCredentialsException;
 import ru.classroom.repository.UserCredentialsRepository;
 import ru.classroom.repository.UserRepository;
@@ -116,15 +117,11 @@ public class UserAuthenticationService extends UserService {
                 ));
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), credentials.getPasswordHash())) {
-            throw new IllegalArgumentException(
-                    "Неверный текущий пароль"
-            );
+            throw new InvalidCredentialsException("Неверный текущий пароль");
         }
 
         if (passwordEncoder.matches(request.getNewPassword(), credentials.getPasswordHash())) {
-            throw new IllegalArgumentException(
-                    "Новый пароль должен отличаться от текущего"
-            );
+            throw new ConflictException("Новый пароль должен отличаться от текущего");
         }
 
         credentials.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));

@@ -1,13 +1,8 @@
 import api from './api'
 import { setAccessToken } from '@/types/AccessToken.ts'
 import { API_PATHS } from '@/constants/apiPaths'
-import { MESSAGES } from '@/constants/messages'
-import type { LoginResponse } from '@/types/Auth.ts'
-import type { SnackbarType } from '@/types/Snackbar.ts'
 import { useCurrentUserStore } from '@/stores/currentUser'
-import { getErrorMessage } from '@/utils/getErrorMessage'
-import { logoutUser } from '@/services/auth'
-import { inject } from 'vue'
+import type { LoginResponse } from '@/types/Auth.ts'
 
 export async function initializeAuth(): Promise<void> {
   const currentUserStore = useCurrentUserStore()

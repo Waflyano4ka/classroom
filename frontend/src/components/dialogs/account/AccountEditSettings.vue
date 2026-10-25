@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, onMounted, watch, inject} from 'vue'
+import {ref, onMounted, inject} from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCurrentUserUpdateStore } from '@/stores/currentUserUpdate'
 import { useCurrentUserStore } from '@/stores/currentUser'
@@ -23,7 +23,6 @@ const { draft } = storeToRefs(updateStore)
 
 const formRef = ref()
 const isLoading = ref(false)
-const errorMessage = ref('')
 const showSnackbar = inject<
   (message: string, type?: SnackbarType) => void
 >('showSnackbar')
@@ -37,7 +36,6 @@ async function edit() {
   if (!valid) return
 
   isLoading.value = true
-  errorMessage.value = ''
 
   try {
     const response = await api.put<CurrentUser>(

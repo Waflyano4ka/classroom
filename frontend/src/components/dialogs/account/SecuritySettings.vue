@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
+import { passwordConfirmationRule, passwordRule, requiredRule } from "@/utils/validation.ts";
+import { MESSAGES } from "@/constants/messages.ts";
+import { API_PATHS } from "@/constants/apiPaths.ts";
+import axios from "axios";
+import api from "@/services/api.ts";
 
-import {passwordConfirmationRule, passwordRule, requiredRule} from "@/utils/validation.ts";
+import type { SnackbarType } from "@/types/Snackbar.ts";
 
+const formRef = ref()
 const visibleCurrentPassword = ref(false)
 const visiblePassword = ref(false)
 const visibleRePassword = ref(false)
@@ -12,9 +18,38 @@ const password = ref('')
 const passwordConfirmation = ref('')
 
 const isLoading = ref(false)
+const showSnackbar = inject<
+  (message: string, type?: SnackbarType) => void
+>('showSnackbar')
 
 const changePassword = async () => {
+  const { valid } = await formRef.value.validate()
+  if (!valid) return
 
+  isLoading.value = true
+  try {
+    await api.put(API_PATHS.AUTH.CHANGE_PASSWORD, {
+      currentPassword: currentPassword.value,
+      newPassword: password.value,
+    })
+
+    currentPassword.value = ''
+    password.value = ''
+    passwordConfirmation.value = ''
+    formRef.value.resetValidation()
+
+    showSnackbar?.(MESSAGES.AUTH.CHANGE_PASSWORD_SUCCESS, 'success')
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      showSnackbar?.(
+        error.response?.data?.message ?? MESSAGES.AUTH.CHANGE_PASSWORD_ERROR, 'error'
+      )
+    } else {
+      showSnackbar?.(MESSAGES.AUTH.CHANGE_PASSWORD_ERROR, 'error')
+    }
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
