@@ -1,10 +1,9 @@
 package ru.classroom.controller;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 import ru.classroom.dto.CurrentUserResponse;
+import ru.classroom.dto.UpdateCurrentUserRequest;
 import ru.classroom.service.user.UserService;
 
 @RestController
@@ -24,5 +23,16 @@ public class CurrentUserController {
     @GetMapping("/me")
     public CurrentUserResponse getCurrentUser() {
         return userService.getCurrentUserResponse();
+    }
+
+    /**
+     * Обновляет данные текущего авторизованного пользователя.
+     * Проверяет уникальность логина и электронной почты при их изменении.
+     * @param request данные для обновления профиля пользователя
+     * @return обновлённые данные пользователя
+     */
+    @PutMapping("/me")
+    public CurrentUserResponse updateCurrentUser(@Valid @RequestBody UpdateCurrentUserRequest request) {
+        return userService.updateCurrentUser(request);
     }
 }

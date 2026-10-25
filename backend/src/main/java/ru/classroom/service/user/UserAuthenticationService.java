@@ -4,7 +4,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.classroom.config.jwt.JwtService;
+import ru.classroom.dto.ChangePasswordRequest;
 import ru.classroom.dto.LocalLoginResult;
 import ru.classroom.dto.LocalLoginUserRequest;
 import ru.classroom.dto.LocalLoginUserResponse;
@@ -88,5 +90,43 @@ public class UserAuthenticationService extends UserService {
         }
 
         return jwtService.generateAccessToken(userId);
+    }
+
+    /**
+     * Изменяет пароль текущего авторизованного пользователя.
+     * Проверяет правильность текущего пароля и убеждается, что новый пароль
+     * отличается от текущего.
+     * @param request данные для изменения пароля
+     * @throws IllegalStateException если пользователь не найден или отсутствуют
+     *                                данные для аутентификации
+     * @throws IllegalArgumentException если текущий пароль указан неверно
+     *                                   или новый пароль совпадает с текущим
+     */
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+        User user = getCurrentUser()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Авторизованный пользователь не найден"
+                ));
+
+        UserCredentials credentials = userCredentialsRepository
+                .findById(user.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "У пользователя отсутствуют данные для аутентификации"
+                ));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), credentials.getPasswordHash())) {
+            throw new IllegalArgumentException(
+                    "Неверный текущий пароль"
+            );
+        }
+
+        if (passwordEncoder.matches(request.getNewPassword(), credentials.getPasswordHash())) {
+            throw new IllegalArgumentException(
+                    "Новый пароль должен отличаться от текущего"
+            );
+        }
+
+        credentials.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
     }
 }

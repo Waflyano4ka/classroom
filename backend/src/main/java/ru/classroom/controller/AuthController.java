@@ -5,10 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.classroom.dto.LocalLoginResult;
-import ru.classroom.dto.LocalLoginUserRequest;
-import ru.classroom.dto.LocalLoginUserResponse;
-import ru.classroom.dto.LocalRegisterUserRequest;
+import ru.classroom.dto.*;
 import ru.classroom.service.user.RefreshTokenCookieService;
 import ru.classroom.service.user.UserAuthenticationService;
 import ru.classroom.service.user.UserRegistrationService;
@@ -85,5 +82,15 @@ public class AuthController {
         }
 
         return ResponseEntity.ok(new LocalLoginUserResponse(accessToken));
+    }
+
+    /**
+     * Изменяет пароль текущего авторизованного пользователя.
+     * @param request данные для изменения пароля
+     */
+    @PutMapping("/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        userAuthenticationService.changePassword(request);
     }
 }

@@ -50,6 +50,10 @@ public class UserCredentials {
         return passwordHash;
     }
 
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
     }
