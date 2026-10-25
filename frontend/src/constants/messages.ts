@@ -8,5 +8,7 @@ export const MESSAGES = {
   },
   USER: {
     LOAD_ERROR: 'Не удалось загрузить данные аккаунта',
+    UPDATE_ERROR: 'Не удалось сохранить изменения',
+    UPDATE_SUCCESS: 'Данные обновлены',
   },
 } as const

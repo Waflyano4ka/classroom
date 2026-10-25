@@ -1,49 +1,76 @@
 <script setup lang="ts">
-import { ref, shallowRef, computed } from 'vue'
+import { ref, shallowRef, markRaw, computed } from 'vue'
 import { useCurrentUserStore } from '@/stores/currentUser.ts'
-
-const currentUserStore = useCurrentUserStore()
-const { isLoading } = currentUserStore
+import { useCurrentUserUpdateStore } from "@/stores/currentUserUpdate.ts";
 
 import AccountSettings from './AccountSettings.vue'
 import AccountEditSettings from './AccountEditSettings.vue'
 import SecuritySettings from './SecuritySettings.vue'
 
-const dialog = shallowRef(false)
+const updateStore = useCurrentUserUpdateStore()
+const currentUserStore = useCurrentUserStore()
+const { isLoading } = currentUserStore
 
+const dialog = shallowRef(false)
+const isEditingAccount = ref(false)
+
+// Обычные объекты — без component
 const menuItems = ref([
   {
+    key: 'account',
     title: 'Аккаунт',
     subtitle: 'Персональная информация',
     icon: 'mdi-account-outline',
     active: true,
-    component: AccountSettings,
   },
   {
+    key: 'security',
     title: 'Безопасность',
     subtitle: 'Пароль и авторизация',
     icon: 'mdi-shield-outline',
     active: false,
-    component: SecuritySettings,
-  }
+  },
 ])
-const isEditingAccount = ref(false)
 
-const activeComponent = computed(() => {
-  if (activeItem.value?.title === 'Аккаунт' && isEditingAccount.value) {
-    return AccountEditSettings
-  }
-  return activeItem.value?.component
-})
-
+// Компоненты вне ref — реактивности нет
+const componentsMap: Record<string, unknown> = {
+  account: markRaw(AccountSettings),
+  security: markRaw(SecuritySettings),
+  accountEdit: markRaw(AccountEditSettings),
+}
 
 const activeItem = computed(() =>
   menuItems.value.find(item => item.active)
 )
 
+const activeComponent = computed(() => {
+  if (activeItem.value?.key === 'account' && isEditingAccount.value) {
+    return componentsMap.accountEdit
+  }
+  return activeItem.value
+    ? componentsMap[activeItem.value.key]
+    : null
+})
+
 function setActive(item: typeof menuItems.value[number]) {
   menuItems.value.forEach(i => (i.active = false))
   item.active = true
+  isEditingAccount.value = false
+  updateStore.clearDraft()
+}
+
+function onEdit() {
+  updateStore.initDraft()
+  isEditingAccount.value = true
+}
+
+function onCancel() {
+  updateStore.clearDraft()
+  isEditingAccount.value = false
+}
+
+function onSaved() {
+  updateStore.clearDraft()
   isEditingAccount.value = false
 }
 </script>
@@ -85,7 +112,7 @@ function setActive(item: typeof menuItems.value[number]) {
               <v-icon size="32">mdi-close-circle</v-icon>
             </v-btn>
           </div>
-          <v-row class="flex-nowrap" dense>
+          <v-row class="flex-nowrap" density="compact">
             <!-- Левая колонка -->
             <v-col cols="auto" md="4" lg="3">
               <v-list-item
@@ -122,9 +149,9 @@ function setActive(item: typeof menuItems.value[number]) {
                 <component
                   :is="activeComponent"
                   v-if="activeComponent"
-                  @edit="isEditingAccount = true"
-                  @cancel="isEditingAccount = false"
-                  @saved="isEditingAccount = false"
+                  @edit="onEdit"
+                  @cancel="onCancel"
+                  @saved="onSaved"
                 />
               </div>
             </v-col>

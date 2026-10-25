@@ -1,60 +1,70 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import {ref, onMounted, watch, inject} from 'vue'
 import { storeToRefs } from 'pinia'
+import { useCurrentUserUpdateStore } from '@/stores/currentUserUpdate'
 import { useCurrentUserStore } from '@/stores/currentUser'
-import {emailRule, nameRule, passwordRule, requiredRule, usernameRule} from "@/utils/validation.ts";
+import { API_PATHS } from "@/constants/apiPaths.ts";
+import { MESSAGES } from "@/constants/messages.ts";
+import { emailRule, nameRule, requiredRule, usernameRule} from "@/utils/validation.ts";
+import api from '@/services/api';
+import axios from "axios";
+
+import type { CurrentUser } from "@/types/CurrentUser.ts"
+import type { SnackbarType } from "@/types/Snackbar.ts";
 
 const emit = defineEmits<{
   cancel: []
   saved: []
 }>()
 
-const { user } = storeToRefs(useCurrentUserStore())
+const updateStore = useCurrentUserUpdateStore()
+const currentUserStore = useCurrentUserStore()
+const { draft } = storeToRefs(updateStore)
 
-const form = ref({
-  lastName: '',
-  firstName: '',
-  middleName: '',
-  username: '',
-  email: '',
-})
-
-const loading = ref(false)
 const formRef = ref()
+const isLoading = ref(false)
+const errorMessage = ref('')
+const showSnackbar = inject<
+  (message: string, type?: SnackbarType) => void
+>('showSnackbar')
 
-// Заполняем форму текущими данными
-watch(
-  user,
-  (value) => {
-    if (!value) return
-    form.value = {
-      lastName: value.lastName ?? '',
-      firstName: value.firstName ?? '',
-      middleName: value.middleName ?? '',
-      username: value.username ?? '',
-      email: value.email ?? '',
-    }
-  },
-  { immediate: true }
-)
+onMounted(() => {
+  updateStore.initDraft()
+})
 
 async function edit() {
   const { valid } = await formRef.value.validate()
   if (!valid) return
 
-  loading.value = true
+  isLoading.value = true
+  errorMessage.value = ''
+
   try {
-    // await api.patch(...)
+    const response = await api.put<CurrentUser>(
+      API_PATHS.USERS.ME,
+      draft.value,
+    )
+
+    currentUserStore.user = response.data
+    showSnackbar?.(MESSAGES.USER.UPDATE_SUCCESS, 'success')
     emit('saved')
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      showSnackbar?.(
+        error.response?.data?.message ?? MESSAGES.USER.UPDATE_ERROR, 'error'
+      )
+    } else {
+      showSnackbar?.(MESSAGES.USER.UPDATE_ERROR, 'error')
+    }
   } finally {
-    loading.value = false
+    isLoading.value = false
   }
 }
 </script>
 
 <template>
   <div class="account-settings d-flex flex-column h-100">
-    <v-form class="flex-grow-1 overflow-y-auto px-2 pt-2 thin-scroll" @submit.prevent="edit">
+    <v-form v-if="draft" ref="formRef" class="flex-grow-1 overflow-y-auto px-2 pt-2 thin-scroll" @submit.prevent="edit">
       <div class="profile-layout mb-1">
         <!-- Аватар: на мобильном сверху, на большом справа -->
         <v-avatar size="216" color="primary" class="profile-avatar">
@@ -63,7 +73,7 @@ async function edit() {
 
         <div class="profile-fields">
           <v-text-field
-            :model-value="user?.lastName"
+            v-model="draft.lastName"
             label="Фамилия"
             variant="outlined"
             color="primary"
@@ -74,7 +84,7 @@ async function edit() {
           />
 
           <v-text-field
-            :model-value="user?.firstName"
+            v-model="draft.firstName"
             label="Имя"
             variant="outlined"
             color="primary"
@@ -85,7 +95,7 @@ async function edit() {
           />
 
           <v-text-field
-            :model-value="user?.middleName"
+            v-model="draft.middleName"
             label="Отчество"
             variant="outlined"
             color="primary"
@@ -96,7 +106,7 @@ async function edit() {
         </div>
       </div>
       <v-text-field
-        :model-value="user?.username"
+        v-model="draft.username"
         label="Логин"
         variant="outlined"
         color="primary"
@@ -106,7 +116,7 @@ async function edit() {
         :rules="[requiredRule, usernameRule]"
       />
       <v-text-field
-        :model-value="user?.email"
+        v-model="draft.email"
         label="Почта"
         variant="outlined"
         color="primary"
@@ -134,7 +144,8 @@ async function edit() {
         rounded="lg"
         class="text-background font-weight-bold text-none me-0"
         prepend-icon="mdi-content-save"
-        @click="emit('saved')"
+        :loading="isLoading"
+        @click="edit"
       >
         Сохранить
       </v-btn>

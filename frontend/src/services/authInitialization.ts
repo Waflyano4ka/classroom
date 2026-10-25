@@ -11,10 +11,10 @@ import { inject } from 'vue'
 
 export async function initializeAuth(): Promise<void> {
   const currentUserStore = useCurrentUserStore()
-  const showSnackbar = inject<
+/*  const showSnackbar = inject<
     (message: string, type?: SnackbarType) => void
-  >('showSnackbar')
-
+  >('showSnackbar')*/
+  // todo исправить showSnackbar
   // Восстановление авторизации
   try {
     const response = await api.post<LoginResponse>(
@@ -26,10 +26,10 @@ export async function initializeAuth(): Promise<void> {
     setAccessToken(null)
     useCurrentUserStore().clearCurrentUser()
 
-    showSnackbar?.(
+/*    showSnackbar?.(
       getErrorMessage(error, MESSAGES.AUTH.SESSION_RESTORE_ERROR),
       'error',
-    )
+    )*/
 
     return
   }
@@ -40,9 +40,9 @@ export async function initializeAuth(): Promise<void> {
   } catch (error) {
     currentUserStore.clearCurrentUser()
 
-    showSnackbar?.(
+/*    showSnackbar?.(
       getErrorMessage(error, MESSAGES.USER.LOAD_ERROR),
       'error',
-    )
+    )*/
   }
 }
