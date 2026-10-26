@@ -19,6 +19,7 @@ public class AuthProvider {
     private String name;
 
     protected AuthProvider() {
+
     }
 
     public Long getId() {

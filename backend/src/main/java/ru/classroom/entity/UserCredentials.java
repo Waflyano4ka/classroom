@@ -31,6 +31,7 @@ public class UserCredentials {
     private OffsetDateTime updatedAt;
 
     protected UserCredentials() {
+
     }
 
     public UserCredentials(String userId, String passwordHash) {
