@@ -164,6 +164,7 @@ function onSaved() {
 </template>
 
 <style scoped>
+/* eslint-disable-next-line no-unused-vars todo Отключить варнинги по no-unused стилям, они на самом деле используются*/
 .account-button {
   height: 48px;
   font-size: 20px;

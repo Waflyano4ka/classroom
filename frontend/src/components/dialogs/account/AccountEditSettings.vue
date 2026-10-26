@@ -69,6 +69,7 @@ async function edit() {
           <!-- todo сделать возможность отображения аватара -->
         </v-avatar>
 
+        <!-- Поля -->
         <div class="profile-fields">
           <v-text-field
             v-model="draft.lastName"
