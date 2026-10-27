@@ -1,4 +1,4 @@
-package ru.classroom.dto;
+package ru.classroom.dto.user;
 
 import java.time.OffsetDateTime;
 

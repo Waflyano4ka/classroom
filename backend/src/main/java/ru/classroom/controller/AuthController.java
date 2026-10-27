@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.classroom.dto.*;
+import ru.classroom.dto.auth.*;
 import ru.classroom.service.user.RefreshTokenCookieService;
 import ru.classroom.service.user.UserAuthenticationService;
 import ru.classroom.service.user.UserRegistrationService;

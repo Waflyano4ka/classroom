@@ -3,7 +3,7 @@ package ru.classroom.service.user;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.classroom.dto.LocalRegisterUserRequest;
+import ru.classroom.dto.auth.LocalRegisterUserRequest;
 import ru.classroom.entity.AccountStatus;
 import ru.classroom.entity.AuthProvider;
 import ru.classroom.entity.User;

@@ -2,8 +2,8 @@ package ru.classroom.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import ru.classroom.dto.CurrentUserResponse;
-import ru.classroom.dto.UpdateCurrentUserRequest;
+import ru.classroom.dto.user.CurrentUserResponse;
+import ru.classroom.dto.user.UpdateCurrentUserRequest;
 import ru.classroom.service.user.UserService;
 
 @RestController

@@ -1,4 +1,4 @@
-package ru.classroom.dto;
+package ru.classroom.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 
