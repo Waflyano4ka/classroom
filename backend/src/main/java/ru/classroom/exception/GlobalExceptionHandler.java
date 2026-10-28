@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.security.InvalidParameterException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -23,6 +25,15 @@ public class GlobalExceptionHandler {
         return new ApiError(
                 "ERR-400-001",
                 "Некорректные данные"
+        );
+    }
+
+    @ExceptionHandler(InvalidParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleInvalidParameterException(InvalidParameterException exception) {
+        return new ApiError(
+                "ERR-400-002",
+                exception.getMessage()
         );
     }
 

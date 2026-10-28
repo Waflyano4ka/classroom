@@ -38,10 +38,9 @@ public class Classroom {
 
     }
 
-    public Classroom(String id, String name, String description, ClassroomColor color) {
+    public Classroom(String id, String name, ClassroomColor color) {
         this.id = id;
         this.name = name;
-        this.description = description;
         this.color = color;
     }
 

@@ -18,8 +18,14 @@ public class ClassroomController {
         this.classroomColorService = classroomColorService;
     }
 
+    /**
+     * Возвращает список всех доступных цветов учебных классов.
+     * @return список цветов учебных классов
+     */
     @GetMapping("/colors")
     public List<ClassroomColorResponse> getAllColors() {
         return classroomColorService.getAllClassroomColors();
     }
+
+
 }

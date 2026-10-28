@@ -18,7 +18,7 @@ import java.time.OffsetDateTime;
 public class ClassroomMembership {
 
     @Id
-    private Long id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "classroom_id", nullable = false)
@@ -58,14 +58,14 @@ public class ClassroomMembership {
 
     }
 
-    public ClassroomMembership(Long id, Classroom classroom, User user, Role role) {
+    public ClassroomMembership(String id, Classroom classroom, User user, Role role) {
         this.id = id;
         this.classroom = classroom;
         this.user = user;
         this.role = role;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

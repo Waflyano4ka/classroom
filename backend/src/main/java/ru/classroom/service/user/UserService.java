@@ -91,7 +91,7 @@ public class UserService {
      * @return текущий пользователь или пустой {@link Optional}, если учётная запись не найдена
      * @throws AuthenticationCredentialsNotFoundException если не удалось определить текущего пользователя
      */
-    protected Optional<User> getCurrentUser() {
+    public Optional<User> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof String userId)) {
             throw new AuthenticationCredentialsNotFoundException("Не удалось определить текущего пользователя");
