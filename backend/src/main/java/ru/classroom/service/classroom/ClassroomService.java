@@ -44,12 +44,11 @@ public class ClassroomService {
 
     /**
      * Создаёт класс и добавляет текущего пользователя в качестве создателя.
-     *
      * @param request данные для создания класса
      * @return данные созданного класса для отображения карточки
-     * @throws IllegalStateException если авторизованный пользователь не найден
+     * @throws IllegalStateException     если авторизованный пользователь не найден
      * @throws InvalidParameterException если указан несуществующий цвет класса
-     * @throws IllegalStateException если роль создателя не найдена
+     * @throws IllegalStateException     если роль создателя не найдена
      */
     public ClassroomCardResponse createClassroom(CreateClassroomRequest request) {
         User user = userService.getCurrentUser()
@@ -86,16 +85,17 @@ public class ClassroomService {
 
         ClassroomMembership savedMembership = classroomMembershipRepository.save(membership);
 
-        return toClassroomCardResponse(savedClassroom, savedMembership.getRole());
+        return toClassroomCardResponse(savedMembership);
     }
 
     /**
      * Преобразует сущность класса в DTO карточки класса.
-     * @param classroom сущность класса
-     * @param role роль текущего пользователя в классе
+     * @param classroomMembership сущность участия пользователя в классе
      * @return DTO карточки класса
      */
-    private ClassroomCardResponse toClassroomCardResponse(Classroom classroom, Role role) {
+    private ClassroomCardResponse toClassroomCardResponse(ClassroomMembership classroomMembership) {
+        Classroom classroom = classroomMembership.getClassroom();
+        Role role = classroomMembership.getRole();
         return new ClassroomCardResponse(
                 classroom.getId(),
                 classroom.getName(),
