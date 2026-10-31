@@ -15,12 +15,12 @@ CREATE TABLE IF NOT EXISTS classroom_colors
 
 INSERT INTO classroom_colors (id, code, name, hex_code, text_hex_code)
 VALUES
-    (1, 'SAGE', 'Шалфейный', '#DCE8D5', '#29463E'),
-    (2, 'BLUE', 'Голубой', '#DCE8F5', '#294568'),
-    (3, 'LAVENDER', 'Лавандовый', '#E8DFF5', '#49365E'),
-    (4, 'PEACH', 'Персиковый', '#F7DFD0', '#553D30'),
-    (5, 'ROSE', 'Пудрово-розовый', '#F3D8DD', '#593640'),
-    (6, 'VANILLA', 'Ванильный', '#F7EDC5', '#51451F'),
-    (7, 'MINT', 'Мятный', '#D5EAE2', '#29463E'),
-    (8, 'SAND', 'Песочный', '#EBD5C4', '#503A2C')
+    (1, 'SAGE', 'Шалфейный', '#29463E', '#DCE8D5'),
+    (2, 'BLUE', 'Голубой', '#294568', '#DCE8F5'),
+    (3, 'LAVENDER', 'Лавандовый', '#49365E', '#E8DFF5'),
+    (4, 'PEACH', 'Персиковый', '#553D30', '#F7DFD0'),
+    (5, 'ROSE', 'Пудрово-розовый', '#593640', '#F3D8DD'),
+    (6, 'VANILLA', 'Ванильный', '#51451F', '#F7EDC5'),
+    (7, 'MINT', 'Мятный', '#29463E', '#D5EAE2'),
+    (8, 'SAND', 'Песочный', '#503A2C', '#EBD5C4')
 ON CONFLICT (code) DO NOTHING;

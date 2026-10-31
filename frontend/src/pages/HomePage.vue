@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import ClassCard from "@/components/cards/ClassCard.vue";
 
 const searchQuery = ref('')
 </script>
@@ -60,7 +61,13 @@ const searchQuery = ref('')
         </div>
       </div>
     </v-sheet>
-    <v-sheet class="sheet bg-accentbackground" height="200">
+    <v-sheet class="sheet bg-accentbackground pa-3">
+      <ClassCard
+        title="Обеспечение качества..."
+        subtitle="Антон Олегович Лясников"
+        header-color="#593640"
+        text-color="#F3D8DD"
+      />
     </v-sheet>
   </v-container>
 </template>
