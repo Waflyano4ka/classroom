@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, onMounted, inject} from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCurrentUserUpdateStore } from '@/stores/currentUserUpdate'
 import { useCurrentUserStore } from '@/stores/currentUser'
@@ -11,6 +11,7 @@ import axios from "axios";
 
 import type { CurrentUser } from "@/types/CurrentUser.ts"
 import type { SnackbarType } from "@/types/Snackbar.ts";
+import AccountAvatarSettings from "@/components/avatrs/AccountAvatarSettings.vue";
 
 const emit = defineEmits<{
   cancel: []
@@ -64,12 +65,12 @@ async function edit() {
   <div class="account-settings d-flex flex-column h-100">
     <v-form v-if="draft" ref="formRef" class="flex-grow-1 overflow-y-auto px-2 pt-2 thin-scroll" @submit.prevent="edit">
       <div class="profile-layout mb-1">
-        <!-- Аватар: на мобильном сверху, на большом справа -->
-        <v-avatar size="216" color="primary" class="profile-avatar">
-          <!-- todo сделать возможность отображения аватара -->
-        </v-avatar>
+        <account-avatar-settings
+          :last-name="draft?.lastName"
+          :first-name="draft?.firstName"
+          :login="draft?.username ?? 'unknown'"
+        />
 
-        <!-- Поля -->
         <div class="profile-fields">
           <v-text-field
             v-model="draft.lastName"
@@ -168,15 +169,10 @@ async function edit() {
   gap: 20px;
 }
 
-.profile-avatar {
-  flex-shrink: 0;
-}
-
 .profile-fields {
   width: 100%;
 }
 
-/* Планшет и выше — аватар справа */
 @media (min-width: 600px) {
   .profile-layout {
     flex-direction: row-reverse;

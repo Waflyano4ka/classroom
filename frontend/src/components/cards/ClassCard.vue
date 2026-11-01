@@ -1,14 +1,34 @@
 <script setup lang="ts">
-withDefaults(defineProps<{
+import { computed } from 'vue'
+import ClassroomAvatarCard from "../avatrs/ClassroomAvatarCard.vue"
+
+const props = withDefaults(defineProps<{
   title: string
-  subtitle: string
-  letter?: string
+  lastName?: string | null
+  firstName?: string | null
+  middleName?: string | null
+  username?: string
   headerColor?: string
   textColor?: string
 }>(), {
   headerColor: 'grey',
   textColor: 'black',
 })
+
+const subtitle = computed(() => {
+  const parts = [
+    props.lastName?.trim(),
+    props.firstName?.trim(),
+    props.middleName?.trim(),
+  ].filter(Boolean) // убираем пустые
+
+  if (parts.length > 0) {
+    return parts.join(' ')
+  }
+
+  return props.username
+})
+
 </script>
 
 <template>
@@ -17,7 +37,6 @@ withDefaults(defineProps<{
     elevation="0"
     class="class-card rounded-lg"
   >
-    <!-- Шапка -->
     <v-sheet
       :color="headerColor"
       class="pa-5 pb-10 position-relative rounded-t-lg"
@@ -36,14 +55,11 @@ withDefaults(defineProps<{
         {{ subtitle }}
       </v-card-subtitle>
 
-      <!-- Аватар -->
-      <v-avatar
-        color="primary"
-        size="64"
-        class="card-avatar"
-      >
-        <span class="text-h3">{{ subtitle.charAt(0) }}</span>
-      </v-avatar>
+      <classroom-avatar-card
+        :last-name="lastName"
+        :first-name="firstName"
+        :login="username ?? 'unknown'"
+      />
     </v-sheet>
 
     <v-sheet height="100" color="background" />
@@ -66,12 +82,5 @@ withDefaults(defineProps<{
 .class-card {
   max-width: 360px;
   overflow: visible;
-}
-
-.card-avatar {
-  position: absolute;
-  right: 20px;
-  bottom: -32px;
-  border: 3px solid rgb(var(--v-theme-background));
 }
 </style>

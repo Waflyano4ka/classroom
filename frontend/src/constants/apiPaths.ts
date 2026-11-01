@@ -9,6 +9,9 @@ export const API_PATHS = {
   USERS: {
     ME: '/users/me',
   },
+  CLASSROOMS: {
+    COLORS: 'classrooms/colors',
+  }
 } as const
 
 export const API_BASE_URL = 'http://localhost:8080/api'

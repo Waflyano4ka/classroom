@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useCurrentUserStore } from '@/stores/currentUser'
+import AccountAvatarSettings from "@/components/avatrs/AccountAvatarSettings.vue";
 
 const emit = defineEmits<{
   edit: []
@@ -22,12 +23,12 @@ const { user } = storeToRefs(useCurrentUserStore())
   <div class="account-settings d-flex flex-column h-100">
     <div class="flex-grow-1 overflow-y-auto px-2 pt-2 thin-scroll">
       <div class="profile-layout mb-1">
-        <!-- Аватар: на мобильном сверху, на большом справа -->
-        <v-avatar size="216" color="primary" class="profile-avatar">
-          <!-- todo сделать возможность отображения аватара -->
-        </v-avatar>
+        <account-avatar-settings
+          :last-name="user?.lastName"
+          :first-name="user?.firstName"
+          :login="user?.username ?? 'unknown'"
+        />
 
-        <!-- Поля -->
         <div class="profile-fields">
           <v-text-field
             :model-value="user?.lastName"
@@ -128,15 +129,10 @@ const { user } = storeToRefs(useCurrentUserStore())
   gap: 20px;
 }
 
-.profile-avatar {
-  flex-shrink: 0;
-}
-
 .profile-fields {
   width: 100%;
 }
 
-/* Планшет и выше — аватар справа */
 @media (min-width: 600px) {
   .profile-layout {
     flex-direction: row-reverse;

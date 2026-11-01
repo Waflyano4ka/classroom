@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS classrooms
     name         VARCHAR(100) NOT NULL,
     description  TEXT,
     color_id     BIGINT NOT NULL,
+    invite_code  VARCHAR(6) NOT NULL UNIQUE,
     created_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_archived  BOOLEAN NOT NULL DEFAULT FALSE,

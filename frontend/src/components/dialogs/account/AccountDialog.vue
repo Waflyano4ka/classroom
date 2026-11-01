@@ -114,7 +114,6 @@ function onSaved() {
             </v-btn>
           </div>
           <v-row class="flex-nowrap" density="compact">
-            <!-- Левая колонка -->
             <v-col cols="auto" md="4" lg="3">
               <v-list-item
                 v-for="item in menuItems"
@@ -138,7 +137,6 @@ function onSaved() {
               </v-list-item>
             </v-col>
 
-            <!-- Правый контент -->
             <v-col cols md="8" lg="9" class="d-flex flex-column">
               <div class="mobile-only-title align-center mb-4 flex-shrink-0">
                   <h3 class="text-h5 font-weight-bold mt-2 mb-0">
@@ -194,7 +192,6 @@ function onSaved() {
   min-height: 0;
 }
 
-/* Заголовок справа — только до 800px */
 .mobile-only-title {
   display: none;
 }
@@ -205,7 +202,6 @@ function onSaved() {
   }
 }
 
-/* Убираем отступ после иконки */
 :deep(.menu-item .v-list-item__prepend) {
   margin-inline-end: 0 !important;
 }
@@ -219,7 +215,6 @@ function onSaved() {
   display: none !important;
 }
 
-/* Текст меню — от 800px */
 @media (min-width: 800px) {
   :deep(.menu-item .v-list-item__prepend) {
     margin-inline-end: 12px !important;

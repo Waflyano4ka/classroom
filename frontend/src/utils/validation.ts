@@ -72,3 +72,16 @@ export const nameRule = (value: string) => {
 
   return true
 }
+
+export const classNameRule = (value: string) => {
+  if (!value?.trim()) {
+    return 'Название не должно быть пустым'
+  }
+
+  if (value.length > 100) {
+    return 'Не более 100 символов'
+  }
+
+  return true
+}
+

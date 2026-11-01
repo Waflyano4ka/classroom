@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import ClassCard from "@/components/cards/ClassCard.vue";
+import CreateClassDialog from "@/components/dialogs/class/CreateClassDialog.vue";
 
 const searchQuery = ref('')
 </script>
@@ -40,15 +41,8 @@ const searchQuery = ref('')
         </div>
 
         <div class="buttons bg-background rounded-desktop px-3 pt-3">
-          <v-btn
-            variant="flat"
-            rounded="pill"
-            color="accentbackground"
-            size="large"
-            class="filter-btn"
-          >
-            Создать класс
-          </v-btn>
+          <create-class-dialog/>
+          
           <v-btn
             variant="flat"
             rounded="pill"
@@ -64,7 +58,10 @@ const searchQuery = ref('')
     <v-sheet class="sheet bg-accentbackground pa-3">
       <ClassCard
         title="Обеспечение качества..."
-        subtitle="Антон Олегович Лясников"
+        last-name="Лясников"
+        first-name="Антон"
+        middle-name="Олегович"
+        username="alyasnikov"
         header-color="#593640"
         text-color="#F3D8DD"
       />

@@ -17,15 +17,15 @@ public class UpdateCurrentUserRequest {
     private String email;
 
     @Size(max = 100)
-    @Pattern(regexp = "^[а-яА-ЯёЁa-zA-Z\\s-]+$")
+    @Pattern(regexp = "^$|^[а-яА-ЯёЁa-zA-Z\\s-]+$")
     private String lastName;
 
     @Size(max = 100)
-    @Pattern(regexp = "^[а-яА-ЯёЁa-zA-Z\\s-]+$")
+    @Pattern(regexp = "^$|^[а-яА-ЯёЁa-zA-Z\\s-]+$")
     private String firstName;
 
     @Size(max = 100)
-    @Pattern(regexp = "^[а-яА-ЯёЁa-zA-Z\\s-]+$")
+    @Pattern(regexp = "^$|^[а-яА-ЯёЁa-zA-Z\\s-]+$")
     private String middleName;
 
     public String getUsername() {
