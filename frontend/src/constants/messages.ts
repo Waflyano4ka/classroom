@@ -14,7 +14,9 @@ export const MESSAGES = {
     UPDATE_SUCCESS: 'Данные обновлены',
   },
   CLASSROOM: {
-    COLORS_ERROR: 'Не получилось загрузить цвета',
-    GENERATE_INVITE_ERROR: 'Не получилось сгенерировать код'
+    CREATE_SUCCESS: 'Создан новый класс',
+    CREATE_ERROR: 'Не удалось создать класс',
+    COLORS_ERROR: 'Не удалось загрузить цвета',
+    GENERATE_INVITE_ERROR: 'Не удалось сгенерировать код'
   }
 } as const

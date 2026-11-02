@@ -1,7 +1,8 @@
 package ru.classroom.service.classroom;
 
-import org.apache.tomcat.util.http.InvalidParameterException;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.classroom.dto.classroom.ClassroomCardResponse;
 import ru.classroom.dto.classroom.CreateClassroomRequest;
 import ru.classroom.entity.*;
@@ -52,10 +53,10 @@ public class ClassroomService {
      * @param request данные для создания класса
      * @return данные созданного класса для отображения карточки
      * @throws IllegalStateException     если авторизованный пользователь не найден
-     * @throws InvalidParameterException если указан несуществующий цвет класса
      * @throws IllegalStateException     если роль создателя не найдена
      * @throws ConflictException         Код приглашения уже используется
      */
+    @Transactional
     public ClassroomCardResponse createClassroom(CreateClassroomRequest request) {
         User user = userService.getCurrentUser()
                 .orElseThrow(() -> new IllegalStateException(
@@ -63,9 +64,12 @@ public class ClassroomService {
                 ));
 
         ClassroomColor color = classroomColorRepository.findById(request.getColorId())
-                .orElseThrow(() -> new InvalidParameterException(
-                        "Указан некорректный цвет"
-                ));
+                .orElseGet(() -> classroomColorRepository.findAll()
+                        .stream()
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException(
+                                "В системе отсутствуют доступные цвета классов"
+                        )));
 
         Role creatorRole = roleRepository.findByCode(CREATOR_ROLE_CODE)
                 .orElseThrow(() -> new IllegalStateException(
@@ -89,7 +93,7 @@ public class ClassroomService {
         String classroomMembershipId = generateClassroomMembershipId();
         ClassroomMembership membership = new ClassroomMembership(
                 classroomMembershipId,
-                classroom,
+                savedClassroom,
                 user,
                 creatorRole
         );
@@ -121,13 +125,18 @@ public class ClassroomService {
     private ClassroomCardResponse toClassroomCardResponse(ClassroomMembership classroomMembership) {
         Classroom classroom = classroomMembership.getClassroom();
         Role role = classroomMembership.getRole();
+        User user = classroomMembership.getUser();
         return new ClassroomCardResponse(
                 classroom.getId(),
                 classroom.getName(),
                 classroom.getColor().getHexCode(),
                 classroom.getColor().getTextHexCode(),
-                classroom.isArchived(),
-                role.getCode()
+                role.getCode(),
+                user.getLastName(),
+                user.getFirstName(),
+                user.getMiddleName(),
+                user.getUsername(),
+                classroom.isArchived()
         );
     }
 

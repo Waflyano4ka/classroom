@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { ref, shallowRef, watch, inject , computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import {classNameRule, inviteCodeRule} from "@/utils/validation.ts";
+import { classNameRule, inviteCodeRule } from "@/utils/validation.ts";
 import { useCurrentUserStore } from '@/stores/currentUser'
 import { getInviteCode } from '@/services/classroomInviteCode.ts'
 import ClassCardPreview from "@/components/cards/ClassCardPreview.vue";
 import CustomColorPicker from "@/components/pickers/CustomColorPicker.vue";
 import { MESSAGES } from "@/constants/messages.ts";
+import { API_PATHS } from "@/constants/apiPaths.ts";
+import api from '@/services/api';
 import axios from "axios";
+
 
 import type {SnackbarType} from "@/types/Snackbar.ts";
 import type { ClassroomColor } from "@/types/ClassroomColor.ts";
@@ -16,6 +19,7 @@ const currentUserStore = useCurrentUserStore()
 const { user } = storeToRefs(currentUserStore)
 const dialog = shallowRef(false)
 const formRef = ref()
+const loading = ref(false)
 const loadingCode = ref(false)
 
 const previewUser = computed(() => ({
@@ -81,6 +85,33 @@ watch(dialog, (isOpen) => {
     formRef.value?.resetValidation()
   }
 })
+
+async function submit() {
+  const { valid } = await formRef.value.validate()
+  if (!valid || !form.value.color) return
+
+  loading.value = true
+  try {
+    await api.post(API_PATHS.CLASSROOMS.CREATE, {
+      name: form.value.name.trim(),
+      colorId: form.value.color.id,
+      inviteCode: form.value.code,
+    })
+
+    showSnackbar?.(MESSAGES.CLASSROOM.CREATE_SUCCESS, 'success')
+    dialog.value = false
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      showSnackbar?.(
+        error.response?.data?.message ?? MESSAGES.CLASSROOM.CREATE_ERROR, 'error'
+      )
+    } else {
+      showSnackbar?.(MESSAGES.CLASSROOM.CREATE_ERROR, 'error')
+    }
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
@@ -120,7 +151,7 @@ watch(dialog, (isOpen) => {
             </v-btn>
           </div>
 
-          <v-form ref="formRef" class="flex-grow-1 overflow-y-auto px-2 pt-2 thin-scroll">
+          <v-form ref="formRef" class="flex-grow-1 overflow-y-auto px-2 pt-2 thin-scroll" @submit.prevent="submit">
             <v-text-field
               v-model="form.name"
               label="Название класса"
@@ -185,7 +216,9 @@ watch(dialog, (isOpen) => {
               variant="flat"
               size="large"
               rounded="lg"
-              class="text-background font-weight-bold text-none me-0"\
+              class="text-background font-weight-bold text-none me-0"
+              :loading="loading"
+              @click="submit"
             >
               Создать класс
             </v-btn>

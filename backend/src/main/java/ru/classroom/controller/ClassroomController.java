@@ -1,9 +1,11 @@
 package ru.classroom.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import ru.classroom.dto.classroom.ClassroomCardResponse;
 import ru.classroom.dto.classroom.ClassroomColorResponse;
+import ru.classroom.dto.classroom.CreateClassroomRequest;
 import ru.classroom.dto.classroom.InviteCodeResponse;
 import ru.classroom.service.classroom.ClassroomColorService;
 import ru.classroom.service.classroom.ClassroomService;
@@ -39,5 +41,17 @@ public class ClassroomController {
     public InviteCodeResponse generateInviteCode() {
         String inviteCode = classroomService.generateInviteCode();
         return new InviteCodeResponse(inviteCode);
+    }
+
+    /**
+     * Создаёт новый учебный класс и добавляет текущего пользователя
+     * в качестве его создателя.
+     * @param request данные для создания учебного класса
+     * @return информация о созданном классе
+     */
+    @PostMapping("/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ClassroomCardResponse createClassroom(@Valid @RequestBody CreateClassroomRequest request) {
+        return classroomService.createClassroom(request);
     }
 }
