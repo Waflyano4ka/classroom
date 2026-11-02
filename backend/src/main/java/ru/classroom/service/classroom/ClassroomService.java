@@ -5,11 +5,13 @@ import org.springframework.stereotype.Service;
 import ru.classroom.dto.classroom.ClassroomCardResponse;
 import ru.classroom.dto.classroom.CreateClassroomRequest;
 import ru.classroom.entity.*;
+import ru.classroom.exception.ConflictException;
 import ru.classroom.repository.ClassroomColorRepository;
 import ru.classroom.repository.ClassroomMembershipRepository;
 import ru.classroom.repository.ClassroomRepository;
 import ru.classroom.repository.RoleRepository;
 import ru.classroom.service.user.UserService;
+import ru.classroom.util.ClassroomCodeGenerator;
 import ru.classroom.util.IdGenerator;
 
 @Service
@@ -24,6 +26,7 @@ public class ClassroomService {
     private final ClassroomRepository classroomRepository;
     private final RoleRepository roleRepository;
     private final UserService userService;
+    private final ClassroomCodeGenerator classroomCodeGenerator;
     private final IdGenerator idGenerator;
 
     public ClassroomService(
@@ -32,6 +35,7 @@ public class ClassroomService {
             ClassroomRepository classroomRepository,
             RoleRepository roleRepository,
             UserService userService,
+            ClassroomCodeGenerator classroomCodeGenerator,
             IdGenerator idGenerator
     ) {
         this.classroomColorRepository = classroomColorRepository;
@@ -39,6 +43,7 @@ public class ClassroomService {
         this.classroomRepository = classroomRepository;
         this.roleRepository = roleRepository;
         this.userService = userService;
+        this.classroomCodeGenerator = classroomCodeGenerator;
         this.idGenerator = idGenerator;
     }
 
@@ -49,6 +54,7 @@ public class ClassroomService {
      * @throws IllegalStateException     если авторизованный пользователь не найден
      * @throws InvalidParameterException если указан несуществующий цвет класса
      * @throws IllegalStateException     если роль создателя не найдена
+     * @throws ConflictException         Код приглашения уже используется
      */
     public ClassroomCardResponse createClassroom(CreateClassroomRequest request) {
         User user = userService.getCurrentUser()
@@ -66,11 +72,16 @@ public class ClassroomService {
                         "Роль CREATOR не найдена"
                 ));
 
+        if (classroomRepository.existsByInviteCode(request.getInviteCode())) {
+            throw new ConflictException("Этот код уже используется");
+        }
+
         String classroomId = generateClassroomId();
         Classroom classroom = new Classroom(
                 classroomId,
                 request.getName(),
-                color
+                color,
+                request.getInviteCode()
         );
 
         Classroom savedClassroom = classroomRepository.save(classroom);
@@ -86,6 +97,20 @@ public class ClassroomService {
         ClassroomMembership savedMembership = classroomMembershipRepository.save(membership);
 
         return toClassroomCardResponse(savedMembership);
+    }
+
+    /**
+     * Генерирует уникальный код приглашения, проверяя его отсутствие в базе данных.
+     * @return уникальный код приглашения
+     */
+    public String generateInviteCode() {
+        String inviteCode;
+
+        do {
+            inviteCode = classroomCodeGenerator.generate();
+        } while (classroomRepository.existsByInviteCode(inviteCode));
+
+        return inviteCode;
     }
 
     /**

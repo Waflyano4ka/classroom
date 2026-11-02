@@ -1,11 +1,51 @@
 <script setup lang="ts">
-import { shallowRef } from 'vue'
+import { ref, shallowRef, watch, computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { classNameRule } from "@/utils/validation.ts";
+import { useCurrentUserStore } from '@/stores/currentUser'
 import ClassCardPreview from "@/components/cards/ClassCardPreview.vue";
-import ClassCard from "@/components/cards/ClassCard.vue";
 import CustomColorPicker from "@/components/pickers/CustomColorPicker.vue";
 
+import type { ClassroomColor } from "@/types/ClassroomColor.ts";
+
+const currentUserStore = useCurrentUserStore()
+const { user } = storeToRefs(currentUserStore)
+
+const previewUser = computed(() => ({
+  lastName: user.value?.lastName ?? null,
+  firstName: user.value?.firstName ?? null,
+  middleName: user.value?.middleName ?? null,
+  username: user.value?.username ?? 'unknown',
+}))
+
 const dialog = shallowRef(false)
+const formRef = ref()
+
+const form = ref({
+  name: '',
+  code: '',
+  color: null as ClassroomColor | null,
+})
+
+function resetForm() {
+  form.value = {
+    name: '',
+    code: '',
+    color: null,
+  }
+  formRef.value?.resetValidation()
+}
+
+const defaultColor = ref<ClassroomColor | null>(null)
+watch(
+  () => form.value.color,
+  (color) => {
+    if (color && !defaultColor.value) {
+      defaultColor.value = color
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -47,6 +87,7 @@ const dialog = shallowRef(false)
 
           <v-form ref="formRef" class="flex-grow-1 overflow-y-auto px-2 pt-2 thin-scroll">
             <v-text-field
+              v-model="form.name"
               label="Название класса"
               variant="outlined"
               color="primary"
@@ -56,6 +97,7 @@ const dialog = shallowRef(false)
               :rules="[classNameRule]"
             />
             <v-text-field
+              v-model="form.code"
               label="Код подключения"
               variant="outlined"
               color="primary"
@@ -64,25 +106,25 @@ const dialog = shallowRef(false)
               readonly
               class="mb-1"
             />
-            <v-row>
+            <v-row align="stretch">
               <v-col cols="12" md="6">
                 <div class="preview-wrapper pa-3 rounded-lg bg-accentbackground">
                   <class-card-preview
                     class="preview-card"
-                    title="Обеспечение качества..."
-                    last-name="Лясников"
-                    first-name="Антон"
-                    middle-name="Олегович"
-                    username="alyasnikov"
-                    header-color="#593640"
-                    text-color="#F3D8DD"
+                    :title="form.name || 'Название класса'"
+                    :last-name="previewUser.lastName"
+                    :first-name="previewUser.firstName"
+                    :middle-name="previewUser.middleName"
+                    :username="previewUser.username"
+                    :header-color="form.color?.hexCode"
+                    :text-color="form.color?.textHexCode"
                   />
                 </div>
               </v-col>
 
               <v-col cols="12" md="6">
                 <div class="pa-3">
-                  <custom-color-picker/>
+                  <custom-color-picker v-model="form.color" />
                 </div>
               </v-col>
             </v-row>
@@ -95,6 +137,7 @@ const dialog = shallowRef(false)
               size="large"
               rounded="lg"
               class="text-none me-2"
+              @click="resetForm"
             >
               Сбросить
             </v-btn>
@@ -144,17 +187,18 @@ const dialog = shallowRef(false)
   min-width: 120px;
 }
 
-/* Превью на весь блок */
 .preview-wrapper {
-  height: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: center;       /* вертикальный центр */
+  justify-content: center;   /* горизонтальный центр */
+  min-height: 100%;
 }
 
 .preview-card {
   width: 100%;
   max-width: 360px;
+  flex-grow: 0;              /* не растягивать */
+  flex-shrink: 0;
 }
 
 @media (max-width: 800px) {

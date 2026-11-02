@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { getClassroomColors } from "@/services/classroomColorInit.ts";
 
 import type { ClassroomColor } from "@/types/ClassroomColor.ts";
@@ -38,6 +38,18 @@ function selectColor(color: ClassroomColor) {
 onMounted(() => {
   loadColors()
 })
+
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (!value && colors.value.length > 0) {
+      const firstColor = colors.value[0]
+      if (firstColor) {
+        emit('update:modelValue', firstColor)
+      }
+    }
+  }
+)
 </script>
 
 <template>
@@ -52,7 +64,10 @@ onMounted(() => {
         :key="color.id"
         class="color-item"
         :class="{ active: modelValue?.id === color.id }"
-        :style="{ backgroundColor: color.hexCode, color: color.textHexCode }"
+        :style="{
+          backgroundColor: modelValue?.id === color.id ? color.textHexCode : color.hexCode,
+          color: modelValue?.id === color.id ? color.hexCode : color.textHexCode,
+        }"
         @click="selectColor(color)"
       >
         <span class="color-name">{{ color.name }}</span>
@@ -86,11 +101,6 @@ onMounted(() => {
 
 .color-item:hover {
   transform: scale(1.05);
-}
-
-.color-item.active {
-  border-color: rgb(var(--v-theme-primary));
-  box-shadow: 0 0 0 2px rgb(var(--v-theme-primary));
 }
 
 .color-name {

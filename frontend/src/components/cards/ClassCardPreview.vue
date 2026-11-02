@@ -80,7 +80,9 @@ const subtitle = computed(() => {
 
 <style scoped>
 .class-card {
+  width: 100%;
   max-width: 360px;
+  height: auto;              /* важно: не 100% */
   overflow: visible;
 }
 </style>

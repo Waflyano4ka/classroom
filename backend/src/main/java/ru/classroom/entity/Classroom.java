@@ -23,6 +23,9 @@ public class Classroom {
     @JoinColumn(name = "color_id", nullable = false)
     private ClassroomColor color;
 
+    @Column(name = "invite_code", nullable = false, unique = true, length = 6)
+    private String inviteCode;
+
     @Generated
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime createdAt;
@@ -38,10 +41,11 @@ public class Classroom {
 
     }
 
-    public Classroom(String id, String name, ClassroomColor color) {
+    public Classroom(String id, String name, ClassroomColor color, String inviteCode) {
         this.id = id;
         this.name = name;
         this.color = color;
+        this.inviteCode = inviteCode;
     }
 
     public String getId() {
@@ -58,6 +62,10 @@ public class Classroom {
 
     public ClassroomColor getColor() {
         return color;
+    }
+
+    public String getInviteCode() {
+        return inviteCode;
     }
 
     public OffsetDateTime getCreatedAt() {
