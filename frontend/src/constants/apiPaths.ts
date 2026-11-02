@@ -11,6 +11,7 @@ export const API_PATHS = {
   },
   CLASSROOMS: {
     COLORS: 'classrooms/colors',
+    INVITE_CODE: 'classrooms/invite-code',
   }
 } as const
 

@@ -1,15 +1,22 @@
 <script setup lang="ts">
-import { ref, shallowRef, watch, computed } from 'vue'
+import { ref, shallowRef, watch, inject , computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { classNameRule } from "@/utils/validation.ts";
+import {classNameRule, inviteCodeRule} from "@/utils/validation.ts";
 import { useCurrentUserStore } from '@/stores/currentUser'
+import { getInviteCode } from '@/services/classroomInviteCode.ts'
 import ClassCardPreview from "@/components/cards/ClassCardPreview.vue";
 import CustomColorPicker from "@/components/pickers/CustomColorPicker.vue";
+import { MESSAGES } from "@/constants/messages.ts";
+import axios from "axios";
 
+import type {SnackbarType} from "@/types/Snackbar.ts";
 import type { ClassroomColor } from "@/types/ClassroomColor.ts";
 
 const currentUserStore = useCurrentUserStore()
 const { user } = storeToRefs(currentUserStore)
+const dialog = shallowRef(false)
+const formRef = ref()
+const loadingCode = ref(false)
 
 const previewUser = computed(() => ({
   lastName: user.value?.lastName ?? null,
@@ -18,8 +25,27 @@ const previewUser = computed(() => ({
   username: user.value?.username ?? 'unknown',
 }))
 
-const dialog = shallowRef(false)
-const formRef = ref()
+const showSnackbar = inject<
+  (message: string, type?: SnackbarType) => void
+>('showSnackbar')
+
+async function generateInviteCode() {
+  loadingCode.value = true
+  try {
+    form.value.code = await getInviteCode()
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      showSnackbar?.(
+        error.response?.data?.message ?? MESSAGES.CLASSROOM.GENERATE_INVITE_ERROR,
+        'error'
+      )
+    } else {
+      showSnackbar?.(MESSAGES.CLASSROOM.GENERATE_INVITE_ERROR, 'error')
+    }
+  } finally {
+    loadingCode.value = false
+  }
+}
 
 const form = ref({
   name: '',
@@ -28,12 +54,11 @@ const form = ref({
 })
 
 function resetForm() {
-  form.value = {
-    name: '',
-    code: '',
-    color: null,
-  }
+  form.value.name = ''
+  form.value.color = null
   formRef.value?.resetValidation()
+
+  generateInviteCode()
 }
 
 const defaultColor = ref<ClassroomColor | null>(null)
@@ -46,6 +71,16 @@ watch(
   },
   { immediate: true }
 )
+
+watch(dialog, (isOpen) => {
+  if (isOpen) {
+    generateInviteCode()
+  } else {
+    form.value.name = ''
+    form.value.color = defaultColor.value
+    formRef.value?.resetValidation()
+  }
+})
 </script>
 
 <template>
@@ -105,6 +140,10 @@ watch(
               rounded="lg"
               readonly
               class="mb-1"
+              :loading="loadingCode"
+              append-inner-icon="mdi-refresh"
+              :rules="[inviteCodeRule]"
+              @click:append-inner="generateInviteCode"
             />
             <v-row align="stretch">
               <v-col cols="12" md="6">
@@ -189,15 +228,15 @@ watch(
 
 .preview-wrapper {
   display: flex;
-  align-items: center;       /* вертикальный центр */
-  justify-content: center;   /* горизонтальный центр */
+  align-items: center;
+  justify-content: center;
   min-height: 100%;
 }
 
 .preview-card {
   width: 100%;
   max-width: 360px;
-  flex-grow: 0;              /* не растягивать */
+  flex-grow: 0;
   flex-shrink: 0;
 }
 

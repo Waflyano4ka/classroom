@@ -85,3 +85,18 @@ export const classNameRule = (value: string) => {
   return true
 }
 
+export const inviteCodeRule = (value: string) => {
+  if (!value?.trim()) {
+    return 'Код подключения обязателен'
+  }
+
+  if (value.length !== 6) {
+    return 'Код должен состоять из 6 символов'
+  }
+
+  if (!/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/.test(value)) {
+    return 'Некорректный формат кода'
+  }
+
+  return true
+}

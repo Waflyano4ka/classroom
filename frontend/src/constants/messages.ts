@@ -13,4 +13,8 @@ export const MESSAGES = {
     UPDATE_ERROR: 'Не удалось сохранить изменения',
     UPDATE_SUCCESS: 'Данные обновлены',
   },
+  CLASSROOM: {
+    COLORS_ERROR: 'Не получилось загрузить цвета',
+    GENERATE_INVITE_ERROR: 'Не получилось сгенерировать код'
+  }
 } as const

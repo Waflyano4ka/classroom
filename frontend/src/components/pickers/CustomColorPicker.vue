@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, inject } from 'vue'
 import { getClassroomColors } from "@/services/classroomColorInit.ts";
+import axios from "axios";
+import {MESSAGES} from "@/constants/messages.ts";
 
 import type { ClassroomColor } from "@/types/ClassroomColor.ts";
+import type { SnackbarType } from "@/types/Snackbar.ts";
 
 
 const props = defineProps<{
@@ -15,6 +18,9 @@ const emit = defineEmits<{
 
 const colors = ref<ClassroomColor[]>([])
 const loading = ref(false)
+const showSnackbar = inject<
+  (message: string, type?: SnackbarType) => void
+>('showSnackbar')
 
 async function loadColors() {
   loading.value = true
@@ -25,6 +31,15 @@ async function loadColors() {
     const firstColor = data[0]
     if (firstColor && !props.modelValue) {
       emit('update:modelValue', firstColor)
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      showSnackbar?.(
+        error.response?.data?.message ?? MESSAGES.CLASSROOM.COLORS_ERROR,
+        'error'
+      )
+    } else {
+      showSnackbar?.(MESSAGES.CLASSROOM.COLORS_ERROR, 'error')
     }
   } finally {
     loading.value = false
