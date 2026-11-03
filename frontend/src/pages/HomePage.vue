@@ -26,7 +26,7 @@ const searchQuery = ref('')
       <div class="filters">
         <div class="checkboxes ms-6">
           <v-checkbox
-            label="Избранные"
+            label="Мои классы"
             color="darkfiltersbackground"
             hide-details
             density="compact"
@@ -42,7 +42,7 @@ const searchQuery = ref('')
 
         <div class="buttons bg-background rounded-desktop px-3 pt-3">
           <create-class-dialog/>
-          
+
           <v-btn
             variant="flat"
             rounded="pill"

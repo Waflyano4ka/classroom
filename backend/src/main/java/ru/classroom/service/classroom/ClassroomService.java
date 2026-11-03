@@ -1,6 +1,10 @@
 package ru.classroom.service.classroom;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.classroom.dto.classroom.ClassroomCardResponse;
@@ -101,6 +105,47 @@ public class ClassroomService {
         ClassroomMembership savedMembership = classroomMembershipRepository.save(membership);
 
         return toClassroomCardResponse(savedMembership);
+    }
+
+    /**
+     * Получает список учебных классов текущего пользователя с пагинацией,
+     * фильтрацией и сортировкой.
+     * @param page номер страницы (начиная с 0)
+     * @param size количество элементов на странице
+     * @param isHidden фильтр по скрытым классам
+     * @param isMyProjects фильтр по созданным классам
+     * @return страница с карточками учебных классов
+     */
+    @Transactional(readOnly = true)
+    public Page<ClassroomCardResponse> getClassrooms(
+            int page,
+            int size,
+            boolean isHidden,
+            boolean isMyProjects
+    ) {
+        User user = userService.getCurrentUser()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Авторизованный пользователь не найден"
+                ));
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(
+                        Sort.Order.desc("favorite"),
+                        Sort.Order.asc("classroom.name")
+                )
+        );
+
+        return classroomMembershipRepository.findAllByUserId(
+                        user.getId(),
+                        isHidden,
+                        isMyProjects,
+                        CREATOR_ROLE_CODE,
+                        false,
+                        pageable
+                )
+                .map(this::toClassroomCardResponse);
     }
 
     /**

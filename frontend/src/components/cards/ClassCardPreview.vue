@@ -20,7 +20,7 @@ const subtitle = computed(() => {
     props.lastName?.trim(),
     props.firstName?.trim(),
     props.middleName?.trim(),
-  ].filter(Boolean) // убираем пустые
+  ].filter(Boolean)
 
   if (parts.length > 0) {
     return parts.join(' ')

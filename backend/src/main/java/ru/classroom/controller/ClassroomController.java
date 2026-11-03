@@ -1,7 +1,11 @@
 package ru.classroom.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.classroom.dto.classroom.ClassroomCardResponse;
 import ru.classroom.dto.classroom.ClassroomColorResponse;
@@ -53,5 +57,32 @@ public class ClassroomController {
     @ResponseStatus(HttpStatus.CREATED)
     public ClassroomCardResponse createClassroom(@Valid @RequestBody CreateClassroomRequest request) {
         return classroomService.createClassroom(request);
+    }
+
+    /**
+     * Получает список учебных классов текущего пользователя.
+     * @param page номер страницы (начиная с 0)
+     * @param size количество элементов на странице
+     * @param isHidden фильтр по скрытым классам
+     * @param isMyProjects показывать только созданные пользователем классы
+     * @return страница с карточками учебных классов
+     */
+    @GetMapping
+    public ResponseEntity<Page<ClassroomCardResponse>> getClassrooms(
+            @RequestParam(defaultValue = "0")
+            @Min(0) int page,
+
+            @RequestParam(defaultValue = "12")
+            @Min(1) @Max(12) int size,
+
+            @RequestParam(defaultValue = "false")
+            boolean isHidden,
+
+            @RequestParam(defaultValue = "false")
+            boolean isMyProjects
+    ) {
+        return ResponseEntity.ok(
+                classroomService.getClassrooms(page, size, isHidden, isMyProjects)
+        );
     }
 }
