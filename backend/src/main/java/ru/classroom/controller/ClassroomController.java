@@ -72,8 +72,8 @@ public class ClassroomController {
             @RequestParam(defaultValue = "0")
             @Min(0) int page,
 
-            @RequestParam(defaultValue = "12")
-            @Min(1) @Max(12) int size,
+            @RequestParam(defaultValue = "15")
+            @Min(1) @Max(15) int size,
 
             @RequestParam(defaultValue = "false")
             boolean isHidden,

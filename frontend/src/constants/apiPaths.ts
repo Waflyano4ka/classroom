@@ -10,6 +10,7 @@ export const API_PATHS = {
     ME: '/users/me',
   },
   CLASSROOMS: {
+    LIST: 'classrooms',
     CREATE: 'classrooms/create',
     COLORS: 'classrooms/colors',
     INVITE_CODE: 'classrooms/invite-code',

@@ -22,6 +22,10 @@ const formRef = ref()
 const loading = ref(false)
 const loadingCode = ref(false)
 
+const emit = defineEmits<{
+  created: []
+}>()
+
 const previewUser = computed(() => ({
   lastName: user.value?.lastName ?? null,
   firstName: user.value?.firstName ?? null,
@@ -99,6 +103,7 @@ async function submit() {
     })
 
     showSnackbar?.(MESSAGES.CLASSROOM.CREATE_SUCCESS, 'success')
+    emit('created')
     dialog.value = false
   } catch (error) {
     if (axios.isAxiosError(error)) {
