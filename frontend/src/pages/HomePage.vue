@@ -32,6 +32,7 @@ async function loadClassrooms() {
       size: 15,
       isHidden: isHidden.value,
       isMyProjects: isMyProjects.value,
+      search: searchQuery.value.trim() || undefined,
     })
 
     classrooms.value = data.content
@@ -60,6 +61,11 @@ const paginationVisible = computed(() => {
   return 7
 })
 
+function onSearch() {
+  page.value = 1
+  loadClassrooms()
+}
+
 watch([page, isMyProjects, isHidden], () => {
   loadClassrooms()
 })
@@ -83,7 +89,8 @@ onMounted(() => {
         class="search-field mt-3 mx-3"
         hide-details
         single-line
-        @click:append-inner=""
+        @keyup.enter="onSearch"
+        @click:append-inner="onSearch"
       />
 
       <div class="filters">
@@ -132,14 +139,8 @@ onMounted(() => {
       <div v-else class="cards-grid">
         <ClassCard
           v-for="item in classrooms"
-          :key="item.id"
-          :title="item.name"
-          :last-name="item.lastName"
-          :first-name="item.firstName"
-          :middle-name="item.middleName"
-          :username="item.username"
-          :header-color="item.colorHexCode"
-          :text-color="item.textHexCode"
+          :key="item.memberId"
+          :item="item"
         />
       </div>
 
@@ -150,6 +151,7 @@ onMounted(() => {
           :total-visible="paginationVisible"
           rounded
           active-color="primary"
+          color="darkfiltersbackground"
           density="comfortable"
           show-first-last-page
         />

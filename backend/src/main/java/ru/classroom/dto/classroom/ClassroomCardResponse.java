@@ -1,10 +1,8 @@
 package ru.classroom.dto.classroom;
 
-import java.time.OffsetDateTime;
-
 public class ClassroomCardResponse {
 
-    private final String id;
+    private final String memberId;
     private final String name;
     private final String colorHexCode;
     private final String textHexCode;
@@ -13,10 +11,12 @@ public class ClassroomCardResponse {
     private final String firstName;
     private final String middleName;
     private final String username;
+    private final boolean favorite;
+    private final boolean hidden;
     private final boolean archived;
 
     public ClassroomCardResponse(
-            String id,
+            String memberId,
             String name,
             String colorHexCode,
             String textHexCode,
@@ -25,9 +25,11 @@ public class ClassroomCardResponse {
             String firstName,
             String middleName,
             String username,
+            boolean favorite,
+            boolean hidden,
             boolean archived
     ) {
-        this.id = id;
+        this.memberId = memberId;
         this.name = name;
         this.colorHexCode = colorHexCode;
         this.textHexCode = textHexCode;
@@ -36,11 +38,13 @@ public class ClassroomCardResponse {
         this.firstName = firstName;
         this.middleName = middleName;
         this.username = username;
+        this.favorite = favorite;
+        this.hidden = hidden;
         this.archived = archived;
     }
 
-    public String getId() {
-        return id;
+    public String getMemberId() {
+        return memberId;
     }
 
     public String getName() {
@@ -73,6 +77,14 @@ public class ClassroomCardResponse {
 
     public String getUsername() {
         return username;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public boolean isHidden() {
+        return hidden;
     }
 
     public boolean isArchived() {

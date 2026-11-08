@@ -14,7 +14,8 @@ export const API_PATHS = {
     CREATE: 'classrooms/create',
     COLORS: 'classrooms/colors',
     INVITE_CODE: 'classrooms/invite-code',
-  }
+  },
+  CLASSROOM_MEMBERSHIPS: 'classroom-memberships'
 } as const
 
 export const API_BASE_URL = 'http://localhost:8080/api'

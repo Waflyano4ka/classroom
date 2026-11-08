@@ -89,6 +89,10 @@ public class ClassroomMembership {
         return favorite;
     }
 
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
+
     public boolean isHidden() {
         return hidden;
     }

@@ -64,6 +64,24 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleForbiddenException(ForbiddenException exception) {
+        return new ApiError(
+                "ERR-403-001",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleNotFoundException(NotFoundException exception) {
+        return new ApiError(
+                "ERR-404-001",
+                exception.getMessage()
+        );
+    }
+
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleConflictException(ConflictException exception) {

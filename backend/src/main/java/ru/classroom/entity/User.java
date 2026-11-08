@@ -1,5 +1,6 @@
 package ru.classroom.entity;
 
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.time.OffsetDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
@@ -134,5 +136,25 @@ public class User {
 
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (object == null || Hibernate.getClass(this) != Hibernate.getClass(object)) {
+            return false;
+        }
+
+        User user = (User) object;
+
+        return id != null && id.equals(user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

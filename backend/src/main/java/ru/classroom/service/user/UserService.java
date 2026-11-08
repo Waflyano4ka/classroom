@@ -11,6 +11,7 @@ import ru.classroom.dto.user.CurrentUserResponse;
 import ru.classroom.dto.user.UpdateCurrentUserRequest;
 import ru.classroom.entity.User;
 import ru.classroom.exception.ConflictException;
+import ru.classroom.exception.UserNotFoundException;
 import ru.classroom.repository.UserRepository;
 
 import java.util.Optional;
@@ -61,7 +62,7 @@ public class UserService {
     @Transactional
     public CurrentUserResponse updateCurrentUser(UpdateCurrentUserRequest request) {
         User user = getCurrentUser()
-                .orElseThrow(() -> new IllegalStateException(
+                .orElseThrow(() -> new UserNotFoundException(
                         "Авторизованный пользователь не найден"
                 ));
 

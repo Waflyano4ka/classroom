@@ -11,6 +11,7 @@ import ru.classroom.dto.classroom.ClassroomCardResponse;
 import ru.classroom.dto.classroom.CreateClassroomRequest;
 import ru.classroom.entity.*;
 import ru.classroom.exception.ConflictException;
+import ru.classroom.exception.UserNotFoundException;
 import ru.classroom.repository.ClassroomColorRepository;
 import ru.classroom.repository.ClassroomMembershipRepository;
 import ru.classroom.repository.ClassroomRepository;
@@ -63,7 +64,7 @@ public class ClassroomService {
     @Transactional
     public ClassroomCardResponse createClassroom(CreateClassroomRequest request) {
         User user = userService.getCurrentUser()
-                .orElseThrow(() -> new IllegalStateException(
+                .orElseThrow(() -> new UserNotFoundException(
                         "Авторизованный пользователь не найден"
                 ));
 
@@ -121,10 +122,11 @@ public class ClassroomService {
             int page,
             int size,
             boolean isHidden,
-            boolean isMyProjects
+            boolean isMyProjects,
+            String search
     ) {
         User user = userService.getCurrentUser()
-                .orElseThrow(() -> new IllegalStateException(
+                .orElseThrow(() -> new UserNotFoundException(
                         "Авторизованный пользователь не найден"
                 ));
 
@@ -137,12 +139,14 @@ public class ClassroomService {
                 )
         );
 
+        String normalizedSearch = search == null ? "" : search.trim();
         return classroomMembershipRepository.findAllByUserId(
                         user.getId(),
                         isHidden,
                         isMyProjects,
                         CREATOR_ROLE_CODE,
                         false,
+                        normalizedSearch,
                         pageable
                 )
                 .map(this::toClassroomCardResponse);
@@ -172,7 +176,7 @@ public class ClassroomService {
         Role role = classroomMembership.getRole();
         User user = classroomMembership.getUser();
         return new ClassroomCardResponse(
-                classroom.getId(),
+                classroomMembership.getId(),
                 classroom.getName(),
                 classroom.getColor().getHexCode(),
                 classroom.getColor().getTextHexCode(),
@@ -181,6 +185,8 @@ public class ClassroomService {
                 user.getFirstName(),
                 user.getMiddleName(),
                 user.getUsername(),
+                classroomMembership.isFavorite(),
+                classroomMembership.isHidden(),
                 classroom.isArchived()
         );
     }

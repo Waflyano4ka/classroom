@@ -2,7 +2,7 @@ import api from '@/services/api'
 import { API_PATHS } from '@/constants/apiPaths.ts'
 
 export interface ClassroomCardResponse {
-  id: string
+  memberId: string
   name: string
   colorHexCode: string
   textHexCode: string
@@ -11,6 +11,8 @@ export interface ClassroomCardResponse {
   firstName: string | null
   middleName: string | null
   username: string
+  favorite: boolean
+  hidden: boolean
   archived: boolean
 }
 
@@ -27,6 +29,7 @@ export interface GetClassroomsParams {
   size?: number
   isHidden?: boolean
   isMyProjects?: boolean
+  search?: string
 }
 
 export const getClassrooms = (params: GetClassroomsParams = {}) => {
@@ -36,6 +39,17 @@ export const getClassrooms = (params: GetClassroomsParams = {}) => {
       size: params.size ?? 15,
       isHidden: params.isHidden ?? false,
       isMyProjects: params.isMyProjects ?? false,
+      search: params.search || undefined,
     },
   })
+}
+
+export const updateClassroomFavorite = (
+  classroomMembershipId: string,
+  favorite: boolean
+) => {
+  return api.patch(
+    `${API_PATHS.CLASSROOM_MEMBERSHIPS}/${classroomMembershipId}/favorite`,
+    { favorite }
+  )
 }

@@ -1,34 +1,60 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import {computed, inject, ref} from 'vue'
 import ClassroomAvatarCard from "../avatrs/ClassroomAvatarCard.vue"
+import { updateClassroomFavorite } from '@/services/classroom'
+import axios from "axios";
+import { MESSAGES } from "@/constants/messages.ts";
 
-const props = withDefaults(defineProps<{
-  title: string
-  lastName?: string | null
-  firstName?: string | null
-  middleName?: string | null
-  username?: string
-  headerColor?: string
-  textColor?: string
-}>(), {
-  headerColor: 'grey',
-  textColor: 'black',
-})
+import type { ClassroomCardResponse } from "@/services/classroom.ts";
+import type { SnackbarType } from "@/types/Snackbar.ts";
+
+const props = defineProps<{
+  item: ClassroomCardResponse
+}>()
+
+const isFavorite = ref(props.item.favorite)
+const loadingFavorite = ref(false)
 
 const subtitle = computed(() => {
   const parts = [
-    props.lastName?.trim(),
-    props.firstName?.trim(),
-    props.middleName?.trim(),
+    props.item.lastName?.trim(),
+    props.item.firstName?.trim(),
+    props.item.middleName?.trim(),
   ].filter(Boolean)
 
   if (parts.length > 0) {
     return parts.join(' ')
   }
 
-  return props.username
+  return props.item.username
 })
 
+const showSnackbar = inject<
+  (message: string, type?: SnackbarType) => void
+>('showSnackbar')
+
+async function onToggleFavorite() {
+  if (loadingFavorite.value) return
+
+  loadingFavorite.value = true
+  const nextValue = !isFavorite.value
+
+  try {
+    await updateClassroomFavorite(props.item.memberId, nextValue)
+    isFavorite.value = nextValue
+    props.item.favorite = nextValue
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      showSnackbar?.(
+        error.response?.data?.message ?? MESSAGES.CLASSROOM_MEMBERSHIP.FAVOURITE_ERROR, 'error'
+      )
+    } else {
+      showSnackbar?.(MESSAGES.CLASSROOM_MEMBERSHIP.FAVOURITE_ERROR, 'error')
+    }
+  } finally {
+    loadingFavorite.value = false
+  }
+}
 </script>
 
 <template>
@@ -38,35 +64,43 @@ const subtitle = computed(() => {
     class="class-card rounded-lg"
   >
     <v-sheet
-      :color="headerColor"
+      :color="item.colorHexCode"
       class="pa-5 pb-10 position-relative rounded-t-lg"
     >
       <v-card-title
         class="text-h6 font-weight-medium pa-0 text-truncate pe-16"
-        :style="{ color: textColor }"
+        :style="{ color: item.textHexCode }"
       >
-        {{ title }}
+        {{ item.name }}
       </v-card-title>
 
       <v-card-subtitle
         class="pa-0 text-truncate pe-16 mt-1"
-        :style="{ color: textColor, opacity: 0.85 }"
+        :style="{ color: item.textHexCode, opacity: 0.85 }"
       >
         {{ subtitle }}
       </v-card-subtitle>
 
       <classroom-avatar-card
-        :last-name="lastName"
-        :first-name="firstName"
-        :login="username ?? 'unknown'"
+        :last-name="item.lastName"
+        :first-name="item.firstName"
+        :login="item.username ?? 'unknown'"
       />
     </v-sheet>
 
     <v-sheet height="100" color="background" />
 
     <v-card-actions class="px-3 py-2 bg-background rounded-b-lg">
-      <v-btn icon variant="text" size="small" color="darkfiltersbackground">
-        <v-icon>mdi-bookmark-outline</v-icon>
+      <v-btn
+        icon
+        variant="text"
+        size="small"
+        :color="item.favorite ? 'primary' : 'darkfiltersbackground'"
+        @click.stop="onToggleFavorite"
+      >
+        <v-icon>
+          {{ item.favorite ? 'mdi-bookmark' : 'mdi-bookmark-outline' }}
+        </v-icon>
       </v-btn>
 
       <v-spacer />

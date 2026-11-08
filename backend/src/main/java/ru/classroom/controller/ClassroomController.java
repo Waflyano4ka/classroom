@@ -79,10 +79,13 @@ public class ClassroomController {
             boolean isHidden,
 
             @RequestParam(defaultValue = "false")
-            boolean isMyProjects
+            boolean isMyProjects,
+
+            @RequestParam(required = false)
+            String search
     ) {
         return ResponseEntity.ok(
-                classroomService.getClassrooms(page, size, isHidden, isMyProjects)
+                classroomService.getClassrooms(page, size, isHidden, isMyProjects, search)
         );
     }
 }

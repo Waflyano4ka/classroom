@@ -65,13 +65,13 @@ const subtitle = computed(() => {
     <v-sheet height="100" color="background" />
 
     <v-card-actions class="px-3 py-2 bg-background rounded-b-lg">
-      <v-btn icon variant="text" size="small" color="darkfiltersbackground">
+      <v-btn icon variant="text" size="small" color="darkfiltersbackground" disabled>
         <v-icon>mdi-bookmark-outline</v-icon>
       </v-btn>
 
       <v-spacer />
 
-      <v-btn icon variant="text" size="small" color="darkfiltersbackground">
+      <v-btn icon variant="text" size="small" color="darkfiltersbackground" disabled>
         <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
     </v-card-actions>

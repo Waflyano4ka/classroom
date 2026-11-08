@@ -19,5 +19,8 @@ export const MESSAGES = {
     CREATE_ERROR: 'Не удалось создать класс',
     COLORS_ERROR: 'Не удалось загрузить цвета',
     GENERATE_INVITE_ERROR: 'Не удалось сгенерировать код'
+  },
+  CLASSROOM_MEMBERSHIP: {
+    FAVOURITE_ERROR: 'Не удалось добавить класс в избранные'
   }
 } as const

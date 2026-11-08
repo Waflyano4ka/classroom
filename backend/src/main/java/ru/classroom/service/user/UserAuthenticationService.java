@@ -14,6 +14,7 @@ import ru.classroom.entity.User;
 import ru.classroom.entity.UserCredentials;
 import ru.classroom.exception.ConflictException;
 import ru.classroom.exception.InvalidCredentialsException;
+import ru.classroom.exception.UserNotFoundException;
 import ru.classroom.repository.UserCredentialsRepository;
 import ru.classroom.repository.UserRepository;
 
@@ -106,7 +107,7 @@ public class UserAuthenticationService extends UserService {
     @Transactional
     public void changePassword(ChangePasswordRequest request) {
         User user = getCurrentUser()
-                .orElseThrow(() -> new IllegalStateException(
+                .orElseThrow(() -> new UserNotFoundException(
                         "Авторизованный пользователь не найден"
                 ));
 
