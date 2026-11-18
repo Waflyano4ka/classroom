@@ -2,6 +2,7 @@
 import {computed, inject, ref} from 'vue'
 import ClassroomAvatarCard from "../avatrs/ClassroomAvatarCard.vue"
 import { updateClassroomFavorite } from '@/services/classroom'
+import { isCreator } from '@/constants/roles'
 import axios from "axios";
 import { MESSAGES } from "@/constants/messages.ts";
 
@@ -11,6 +12,18 @@ import type { SnackbarType } from "@/types/Snackbar.ts";
 const props = defineProps<{
   item: ClassroomCardResponse
 }>()
+
+const headerColor = computed(() => {
+  return props.item.archived
+    ? 'darkgray'
+    : props.item.colorHexCode
+})
+
+const textColor = computed(() => {
+  return props.item.archived
+    ? 'lightgray'
+    : props.item.textHexCode
+})
 
 const isFavorite = ref(props.item.favorite)
 const loadingFavorite = ref(false)
@@ -64,31 +77,46 @@ async function onToggleFavorite() {
     class="class-card rounded-lg"
   >
     <v-sheet
-      :color="item.colorHexCode"
-      class="pa-5 pb-10 position-relative rounded-t-lg"
+      :color="headerColor"
+      class="pa-5 pb-10 position-relative rounded-t-lg card-header"
+      :class="{ 'is-hidden': item.hidden }"
     >
       <v-card-title
         class="text-h6 font-weight-medium pa-0 text-truncate pe-16"
-        :style="{ color: item.textHexCode }"
+        :style="{ color: textColor }"
       >
         {{ item.name }}
       </v-card-title>
 
       <v-card-subtitle
         class="pa-0 text-truncate pe-16 mt-1"
-        :style="{ color: item.textHexCode, opacity: 0.85 }"
+        :style="{ color: textColor, opacity: 0.85 }"
       >
         {{ subtitle }}
       </v-card-subtitle>
 
       <classroom-avatar-card
+        class="card-avatar"
         :last-name="item.lastName"
         :first-name="item.firstName"
         :login="item.username ?? 'unknown'"
       />
     </v-sheet>
 
-    <v-sheet height="100" color="background" />
+    <v-sheet
+      height="100"
+      color="background"
+      class="d-flex align-start justify-start pa-4"
+    >
+      <v-chip
+        v-if="item.archived"
+        color="secondary"
+        variant="tonal"
+        prepend-icon="mdi-archive-outline"
+      >
+        В архиве
+      </v-chip>
+    </v-sheet>
 
     <v-card-actions class="px-3 py-2 bg-background rounded-b-lg">
       <v-btn
@@ -105,9 +133,42 @@ async function onToggleFavorite() {
 
       <v-spacer />
 
-      <v-btn icon variant="text" size="small" color="darkfiltersbackground">
-        <v-icon>mdi-dots-vertical</v-icon>
-      </v-btn>
+      <v-menu location="bottom end">
+        <template #activator="{ props: menuProps }">
+          <v-btn
+            icon
+            variant="text"
+            size="small"
+            color="darkfiltersbackground"
+            v-bind="menuProps"
+            @click.stop
+          >
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
+
+        <v-list nav bg-color="background" class="compact-list">
+          <v-list-item
+            :title="item.hidden ? 'Показать' : 'Скрыть'"
+            :prepend-icon="item.hidden ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
+            @click="onHide"
+          />
+          <v-list-item
+            v-if="isCreator(item.permissions)"
+            :title="item.archived ? 'Разархивировать' : 'Архивировать'"
+            :prepend-icon="item.archived ? 'mdi-archive-arrow-up-outline' : 'mdi-archive-outline'"
+            class="text-error"
+            @click="onArchive"
+          />
+          <v-list-item
+            v-else
+            title="Покинуть"
+            prepend-icon="mdi-exit-to-app"
+            class="text-error"
+            @click="onLeave"
+          />
+        </v-list>
+      </v-menu>
     </v-card-actions>
   </v-card>
 </template>
@@ -116,5 +177,37 @@ async function onToggleFavorite() {
 .class-card {
   max-width: 360px;
   overflow: visible;
+}
+
+.card-header.is-hidden::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.18) 0px,
+    rgba(255, 255, 255, 0.18) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+}
+
+.card-avatar {
+  position: absolute;
+  right: 20px;
+  bottom: -28px;
+  z-index: 2; /* выше полосок */
+}
+
+.compact-list :deep(.v-list-item__spacer) {
+  width: 16px !important;
+}
+
+.compact-list :deep(.v-list-item) {
+  min-height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 </style>

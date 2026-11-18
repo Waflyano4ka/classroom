@@ -15,7 +15,9 @@ export default createVuetify({
           darkfiltersbackground: '#66645c',
           darkprimary: '#29463e',
           primary: '#356859',
-          logout: '#ffa0a0'
+          logout: '#ffa0a0',
+          lightgray: '#e1e1e1',
+          darkgray: '#505050'
         },
       },
     },
