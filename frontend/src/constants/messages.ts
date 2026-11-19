@@ -21,6 +21,8 @@ export const MESSAGES = {
     GENERATE_INVITE_ERROR: 'Не удалось сгенерировать код'
   },
   CLASSROOM_MEMBERSHIP: {
-    FAVOURITE_ERROR: 'Не удалось добавить класс в избранные'
+    FAVOURITE_ERROR: 'Не удалось добавить класс в избранные',
+    JOIN_ERROR: 'Не удалось подключиться к классу',
+    JOIN_SUCCESS: 'Вы успешно подключились к классу',
   }
 } as const

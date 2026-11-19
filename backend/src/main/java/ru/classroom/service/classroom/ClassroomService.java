@@ -167,6 +167,19 @@ public class ClassroomService {
     }
 
     /**
+     * Генерирует уникальный идентификатор участия пользователя в классе.
+     * @return уникальный идентификатор участия пользователя
+     */
+    public String generateClassroomMembershipId() {
+        String classroomMembershipId;
+        do {
+            classroomMembershipId = CLASSROOM_MEMBERSHIP_ID_PREFIX + idGenerator.generate();
+        } while (classroomMembershipRepository.existsById(classroomMembershipId));
+
+        return classroomMembershipId;
+    }
+
+    /**
      * Преобразует сущность класса в DTO карточки класса.
      * @param classroomMembership сущность участия пользователя в классе
      * @return DTO карточки класса
@@ -202,18 +215,5 @@ public class ClassroomService {
         } while (classroomRepository.existsById(classroomId));
 
         return classroomId;
-    }
-
-    /**
-     * Генерирует уникальный идентификатор участия пользователя в классе.
-     * @return уникальный идентификатор участия пользователя
-     */
-    private String generateClassroomMembershipId() {
-        String classroomMembershipId;
-        do {
-            classroomMembershipId = CLASSROOM_MEMBERSHIP_ID_PREFIX + idGenerator.generate();
-        } while (classroomMembershipRepository.existsById(classroomMembershipId));
-
-        return classroomMembershipId;
     }
 }

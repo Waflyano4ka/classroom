@@ -49,7 +49,7 @@ export const updateClassroomFavorite = (
   favorite: boolean
 ) => {
   return api.patch(
-    `${API_PATHS.CLASSROOM_MEMBERSHIPS}/${classroomMembershipId}/favorite`,
+    `${API_PATHS.CLASSROOM_MEMBERSHIPS.BASE}/${classroomMembershipId}/favorite`,
     { favorite }
   )
 }

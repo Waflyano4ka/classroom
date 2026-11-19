@@ -1,6 +1,7 @@
 package ru.classroom.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.classroom.dto.user.CurrentUserResponse;
 import ru.classroom.dto.user.UpdateCurrentUserRequest;
@@ -21,8 +22,10 @@ public class CurrentUserController {
      * @return информация о текущем пользователе
      */
     @GetMapping("/me")
-    public CurrentUserResponse getCurrentUser() {
-        return userService.getCurrentUserResponse();
+    public ResponseEntity<CurrentUserResponse> getCurrentUser() {
+        return ResponseEntity.ok(
+            userService.getCurrentUserResponse()
+        );
     }
 
     /**
@@ -32,7 +35,9 @@ public class CurrentUserController {
      * @return обновлённые данные пользователя
      */
     @PutMapping("/me")
-    public CurrentUserResponse updateCurrentUser(@Valid @RequestBody UpdateCurrentUserRequest request) {
-        return userService.updateCurrentUser(request);
+    public ResponseEntity<CurrentUserResponse> updateCurrentUser(@Valid @RequestBody UpdateCurrentUserRequest request) {
+        return ResponseEntity.ok(
+                userService.updateCurrentUser(request)
+        );
     }
 }

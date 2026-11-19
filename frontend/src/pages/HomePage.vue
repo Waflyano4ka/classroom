@@ -6,6 +6,7 @@ import { MESSAGES } from "@/constants/messages.ts";
 import axios from "axios";
 import ClassCard from "@/components/cards/ClassCard.vue";
 import CreateClassDialog from "@/components/dialogs/class/CreateClassDialog.vue";
+import ClassJoinDialog from "@/components/dialogs/class/ClassJoinDialog.vue";
 
 import type { ClassroomCardResponse } from '@/services/classroom'
 import type { SnackbarType } from "@/types/Snackbar.ts";
@@ -115,15 +116,7 @@ onMounted(() => {
         <div class="buttons bg-background rounded-desktop px-3 pt-3">
           <create-class-dialog @created="loadClassrooms"/>
 
-          <v-btn
-            variant="flat"
-            rounded="pill"
-            size="large"
-            color="accentbackground"
-            class="filter-btn"
-          >
-            Подключиться
-          </v-btn>
+          <class-join-dialog @joined="loadClassrooms"/>
         </div>
       </div>
     </v-sheet>

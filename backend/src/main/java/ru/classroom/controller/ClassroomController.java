@@ -33,8 +33,10 @@ public class ClassroomController {
      * @return список цветов учебных классов
      */
     @GetMapping("/colors")
-    public List<ClassroomColorResponse> getAllColors() {
-        return classroomColorService.getAllClassroomColors();
+    public ResponseEntity<List<ClassroomColorResponse>> getAllColors() {
+        return ResponseEntity.ok(
+                classroomColorService.getAllClassroomColors()
+        );
     }
 
     /**
@@ -42,9 +44,11 @@ public class ClassroomController {
      * @return DTO с кодом приглашения
      */
     @GetMapping("/invite-code")
-    public InviteCodeResponse generateInviteCode() {
+    public ResponseEntity<InviteCodeResponse> generateInviteCode() {
         String inviteCode = classroomService.generateInviteCode();
-        return new InviteCodeResponse(inviteCode);
+        return ResponseEntity.ok(
+                new InviteCodeResponse(inviteCode)
+        );
     }
 
     /**
@@ -55,8 +59,10 @@ public class ClassroomController {
      */
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ClassroomCardResponse createClassroom(@Valid @RequestBody CreateClassroomRequest request) {
-        return classroomService.createClassroom(request);
+    public ResponseEntity<ClassroomCardResponse> createClassroom(@Valid @RequestBody CreateClassroomRequest request) {
+        return ResponseEntity.ok(
+                classroomService.createClassroom(request)
+        );
     }
 
     /**

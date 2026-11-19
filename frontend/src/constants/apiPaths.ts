@@ -15,7 +15,10 @@ export const API_PATHS = {
     COLORS: 'classrooms/colors',
     INVITE_CODE: 'classrooms/invite-code',
   },
-  CLASSROOM_MEMBERSHIPS: 'classroom-memberships'
+  CLASSROOM_MEMBERSHIPS: {
+    BASE: 'classroom-memberships',
+    JOIN: 'classroom-memberships/join'
+  }
 } as const
 
 export const API_BASE_URL = 'http://localhost:8080/api'

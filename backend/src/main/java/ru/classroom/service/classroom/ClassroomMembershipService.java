@@ -2,26 +2,43 @@ package ru.classroom.service.classroom;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.classroom.dto.classroommembership.JoinClassroomResponse;
+import ru.classroom.entity.Classroom;
 import ru.classroom.entity.ClassroomMembership;
+import ru.classroom.entity.Role;
 import ru.classroom.entity.User;
+import ru.classroom.exception.ConflictException;
 import ru.classroom.exception.ForbiddenException;
 import ru.classroom.exception.NotFoundException;
 import ru.classroom.exception.UserNotFoundException;
 import ru.classroom.repository.ClassroomMembershipRepository;
+import ru.classroom.repository.ClassroomRepository;
+import ru.classroom.repository.RoleRepository;
 import ru.classroom.service.user.UserService;
 
-import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ClassroomMembershipService {
 
+    private static final String STUDENT_ROLE_CODE = "STUDENT";
+
     private final ClassroomMembershipRepository classroomMembershipRepository;
+    private final ClassroomRepository classroomRepository;
+    private final ClassroomService classroomService;
+    private final RoleRepository roleRepository;
     private final UserService userService;
 
     public ClassroomMembershipService(
             ClassroomMembershipRepository classroomMembershipRepository,
+            ClassroomRepository classroomRepository,
+            ClassroomService classroomService,
+            RoleRepository roleRepository,
             UserService userService) {
         this.classroomMembershipRepository = classroomMembershipRepository;
+        this.classroomRepository = classroomRepository;
+        this.classroomService = classroomService;
+        this.roleRepository = roleRepository;
         this.userService = userService;
     }
 
@@ -34,6 +51,62 @@ public class ClassroomMembershipService {
     public void updateFavorite(String classroomMembershipId, boolean isFavorite) {
         ClassroomMembership membership = getClassroomMembership(classroomMembershipId);
         membership.setFavorite(isFavorite);
+    }
+
+    /**
+     * Подключает текущего пользователя к классу по коду приглашения.
+     * @param inviteCode код для подключения к классу
+     * @return информация о подключённом классе
+     */
+    @Transactional
+    public JoinClassroomResponse joinClassroom(String inviteCode) {
+        User user = userService.getCurrentUser()
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Авторизованный пользователь не найден"
+                ));
+
+        Classroom classroom = classroomRepository.findByInviteCode(inviteCode)
+                .orElseThrow(() -> new NotFoundException(
+                        "Класс с таким кодом не найден"
+                ));
+
+        Optional<ClassroomMembership> existingMembership =
+                classroomMembershipRepository.findByClassroomIdAndUserId(
+                        classroom.getId(),
+                        user.getId()
+                );
+
+        if (existingMembership.isPresent()) {
+            ClassroomMembership membership = existingMembership.get();
+
+            if (membership.isBlocked()) {
+                throw new ConflictException("Вы не можете подключиться к этому классу");
+            }
+
+            if (membership.isLeave()) {
+                membership.setLeave(false);
+                classroomMembershipRepository.save(membership);
+            } else {
+                throw new ConflictException("Вы уже состоите в этом классе");
+            }
+        } else {
+            Role studentRole = roleRepository.findByCode(STUDENT_ROLE_CODE)
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Роль STUDENT не найдена"
+                    ));
+
+            String classroomMembershipId = classroomService.generateClassroomMembershipId();
+            ClassroomMembership newMembership = new ClassroomMembership(
+                    classroomMembershipId,
+                    classroom,
+                    user,
+                    studentRole
+            );
+
+            classroomMembershipRepository.save(newMembership);
+        }
+
+        return new JoinClassroomResponse(classroom.getName());
     }
 
     /**

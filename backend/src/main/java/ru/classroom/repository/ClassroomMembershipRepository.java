@@ -39,4 +39,6 @@ public interface ClassroomMembershipRepository extends JpaRepository<ClassroomMe
             @Param("search") String search,
             Pageable pageable
     );
+
+    Optional<ClassroomMembership> findByClassroomIdAndUserId(String classroomId, String userId);
 }

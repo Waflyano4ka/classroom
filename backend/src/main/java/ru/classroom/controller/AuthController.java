@@ -34,8 +34,9 @@ public class AuthController {
      */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void localRegister(@Valid @RequestBody LocalRegisterUserRequest request) {
+    public ResponseEntity<Void> localRegister(@Valid @RequestBody LocalRegisterUserRequest request) {
         userRegistrationService.localRegister(request);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -44,11 +45,11 @@ public class AuthController {
      * @return ответ с JWT-токеном
      */
     @PostMapping("/login")
-    public LocalLoginUserResponse localLogin(@Valid @RequestBody LocalLoginUserRequest request, HttpServletResponse response) {
+    public ResponseEntity<LocalLoginUserResponse> localLogin(@Valid @RequestBody LocalLoginUserRequest request, HttpServletResponse response) {
         LocalLoginResult result = userAuthenticationService.localLogin(request, response);
         refreshTokenCookieService.setRefreshTokenCookie(result.getUserId(), response);
 
-        return result.getLocalLoginUserResponse();
+        return ResponseEntity.ok(result.getLocalLoginUserResponse());
     }
 
     /**
@@ -57,8 +58,9 @@ public class AuthController {
      */
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(HttpServletResponse response) {
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
         refreshTokenCookieService.clearRefreshTokenCookie(response);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -90,7 +92,8 @@ public class AuthController {
      */
     @PutMapping("/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
         userAuthenticationService.changePassword(request);
+        return ResponseEntity.noContent().build();
     }
 }

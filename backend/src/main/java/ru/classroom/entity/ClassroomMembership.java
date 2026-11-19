@@ -105,6 +105,10 @@ public class ClassroomMembership {
         return leave;
     }
 
+    public void setLeave(boolean leave) {
+        this.leave = leave;
+    }
+
     public String getBlockReason() {
         return blockReason;
     }
