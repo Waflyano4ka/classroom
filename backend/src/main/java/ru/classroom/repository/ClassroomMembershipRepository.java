@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import ru.classroom.dto.ClassroomWithCreatorProjection;
 import ru.classroom.entity.ClassroomMembership;
 
 import java.util.Optional;
@@ -19,8 +20,13 @@ public interface ClassroomMembershipRepository extends JpaRepository<ClassroomMe
             "role"
     })
     @Query("""
-            SELECT cm
+            SELECT new ru.classroom.dto.ClassroomWithCreatorProjection(cm, creatorUser)
             FROM ClassroomMembership cm
+            JOIN cm.classroom c
+            LEFT JOIN ClassroomMembership creatorCm
+              ON creatorCm.classroom = c
+                AND creatorCm.role.code = :creatorRoleCode
+            LEFT JOIN creatorCm.user creatorUser
             WHERE cm.user.id = :userId
               AND (:isMyProject = false OR cm.role.code = :creatorRoleCode)
               AND (:isHidden = true OR cm.hidden = false)
@@ -30,7 +36,7 @@ public interface ClassroomMembershipRepository extends JpaRepository<ClassroomMe
                   OR LOWER(cm.classroom.name) LIKE LOWER(CONCAT('%', :search, '%'))
               )
             """)
-    Page<ClassroomMembership> findAllByUserId(
+    Page<ClassroomWithCreatorProjection> findAllByUserId(
             @Param("userId") String userId,
             @Param("isHidden") boolean isHidden,
             @Param("isMyProject") boolean isMyProject,

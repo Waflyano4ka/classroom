@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.classroom.dto.ClassroomWithCreatorProjection;
 import ru.classroom.dto.classroom.ClassroomCardResponse;
 import ru.classroom.dto.classroom.CreateClassroomRequest;
 import ru.classroom.entity.*;
@@ -103,9 +104,10 @@ public class ClassroomService {
                 creatorRole
         );
 
-        ClassroomMembership savedMembership = classroomMembershipRepository.save(membership);
-
-        return toClassroomCardResponse(savedMembership);
+        return toClassroomCardResponse(new ClassroomWithCreatorProjection(
+                classroomMembershipRepository.save(membership),
+                user
+        ));
     }
 
     /**
@@ -181,25 +183,26 @@ public class ClassroomService {
 
     /**
      * Преобразует сущность класса в DTO карточки класса.
-     * @param classroomMembership сущность участия пользователя в классе
+     * @param classroomWithCreatorProjection сущность участия пользователя в классе и создателя
      * @return DTO карточки класса
      */
-    private ClassroomCardResponse toClassroomCardResponse(ClassroomMembership classroomMembership) {
-        Classroom classroom = classroomMembership.getClassroom();
-        Role role = classroomMembership.getRole();
-        User user = classroomMembership.getUser();
+    private ClassroomCardResponse toClassroomCardResponse(ClassroomWithCreatorProjection classroomWithCreatorProjection) {
+        ClassroomMembership membership = classroomWithCreatorProjection.getMembership();
+        Classroom classroom = membership.getClassroom();
+        Role role = membership.getRole();
+        User creator = classroomWithCreatorProjection.getCreator();
         return new ClassroomCardResponse(
-                classroomMembership.getId(),
+                membership.getId(),
                 classroom.getName(),
                 classroom.getColor().getHexCode(),
                 classroom.getColor().getTextHexCode(),
                 role.getCode(),
-                user.getLastName(),
-                user.getFirstName(),
-                user.getMiddleName(),
-                user.getUsername(),
-                classroomMembership.isFavorite(),
-                classroomMembership.isHidden(),
+                creator.getLastName(),
+                creator.getFirstName(),
+                creator.getMiddleName(),
+                creator.getUsername(),
+                membership.isFavorite(),
+                membership.isHidden(),
                 classroom.isArchived()
         );
     }
