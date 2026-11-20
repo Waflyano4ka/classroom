@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.classroom.constant.RoleCode;
 import ru.classroom.dto.ClassroomWithCreatorProjection;
 import ru.classroom.dto.classroom.ClassroomCardResponse;
 import ru.classroom.dto.classroom.CreateClassroomRequest;
@@ -28,34 +29,33 @@ public class ClassroomService {
 
     private static final String CLASSROOM_ID_PREFIX = "class-";
     private static final String CLASSROOM_MEMBERSHIP_ID_PREFIX = "member-";
-    private static final String CREATOR_ROLE_CODE = "CREATOR";
 
-    private final ClassroomColorRepository classroomColorRepository;
+    private final ClassroomMembershipAccessService classroomMembershipAccessService;
     private final ClassroomMembershipRepository classroomMembershipRepository;
-    private final ClassroomMembershipService classroomMembershipService;
+    private final ClassroomColorRepository classroomColorRepository;
+    private final ClassroomCodeGenerator classroomCodeGenerator;
     private final ClassroomRepository classroomRepository;
     private final RoleRepository roleRepository;
     private final UserService userService;
-    private final ClassroomCodeGenerator classroomCodeGenerator;
     private final IdGenerator idGenerator;
 
     public ClassroomService(
-            ClassroomColorRepository classroomColorRepository,
+            ClassroomMembershipAccessService classroomMembershipAccessService,
             ClassroomMembershipRepository classroomMembershipRepository,
-            ClassroomMembershipService classroomMembershipService,
+            ClassroomColorRepository classroomColorRepository,
+            ClassroomCodeGenerator classroomCodeGenerator,
             ClassroomRepository classroomRepository,
             RoleRepository roleRepository,
             UserService userService,
-            ClassroomCodeGenerator classroomCodeGenerator,
             IdGenerator idGenerator
     ) {
-        this.classroomColorRepository = classroomColorRepository;
+        this.classroomMembershipAccessService = classroomMembershipAccessService;
         this.classroomMembershipRepository = classroomMembershipRepository;
-        this.classroomMembershipService = classroomMembershipService;
+        this.classroomColorRepository = classroomColorRepository;
+        this.classroomCodeGenerator = classroomCodeGenerator;
         this.classroomRepository = classroomRepository;
         this.roleRepository = roleRepository;
         this.userService = userService;
-        this.classroomCodeGenerator = classroomCodeGenerator;
         this.idGenerator = idGenerator;
     }
 
@@ -82,7 +82,7 @@ public class ClassroomService {
                                 "В системе отсутствуют доступные цвета классов"
                         )));
 
-        Role creatorRole = roleRepository.findByCode(CREATOR_ROLE_CODE)
+        Role creatorRole = roleRepository.findByCode(RoleCode.CREATOR.getCode())
                 .orElseThrow(() -> new IllegalStateException(
                         "Роль CREATOR не найдена"
                 ));
@@ -148,7 +148,7 @@ public class ClassroomService {
                         user.getId(),
                         isHidden,
                         isMyProjects,
-                        CREATOR_ROLE_CODE,
+                        RoleCode.CREATOR.getCode(),
                         false,
                         normalizedSearch,
                         pageable
@@ -192,10 +192,10 @@ public class ClassroomService {
      */
     @Transactional
     public NameClassroomResponse updateArchiveClassroom(String classroomMembershipId, boolean isArchived) {
-        ClassroomMembership membership = classroomMembershipService.getClassroomMembership(classroomMembershipId);
-        if (!CREATOR_ROLE_CODE.equals(membership.getRole().getCode())) {
-            throw new AccessDeniedException("Недостаточно прав для выполнения операции");
-        }
+        ClassroomMembership membership = classroomMembershipAccessService.getClassroomMembershipRole(
+                classroomMembershipId,
+                RoleCode.CREATOR.getCode()
+        );
 
         Classroom classroom = membership.getClassroom();
         classroom.setArchived(isArchived);

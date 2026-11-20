@@ -2,13 +2,13 @@ package ru.classroom.service.classroom;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.classroom.constant.RoleCode;
 import ru.classroom.dto.classroommembership.NameClassroomResponse;
 import ru.classroom.entity.Classroom;
 import ru.classroom.entity.ClassroomMembership;
 import ru.classroom.entity.Role;
 import ru.classroom.entity.User;
 import ru.classroom.exception.ConflictException;
-import ru.classroom.exception.ForbiddenException;
 import ru.classroom.exception.NotFoundException;
 import ru.classroom.exception.UserNotFoundException;
 import ru.classroom.repository.ClassroomMembershipRepository;
@@ -21,8 +21,7 @@ import java.util.Optional;
 @Service
 public class ClassroomMembershipService {
 
-    private static final String STUDENT_ROLE_CODE = "STUDENT";
-
+    private final ClassroomMembershipAccessService classroomMembershipAccessService;
     private final ClassroomMembershipRepository classroomMembershipRepository;
     private final ClassroomRepository classroomRepository;
     private final ClassroomService classroomService;
@@ -30,11 +29,13 @@ public class ClassroomMembershipService {
     private final UserService userService;
 
     public ClassroomMembershipService(
+            ClassroomMembershipAccessService classroomMembershipAccessService,
             ClassroomMembershipRepository classroomMembershipRepository,
             ClassroomRepository classroomRepository,
             ClassroomService classroomService,
             RoleRepository roleRepository,
             UserService userService) {
+        this.classroomMembershipAccessService = classroomMembershipAccessService;
         this.classroomMembershipRepository = classroomMembershipRepository;
         this.classroomRepository = classroomRepository;
         this.classroomService = classroomService;
@@ -49,7 +50,7 @@ public class ClassroomMembershipService {
      */
     @Transactional
     public void updateFavorite(String classroomMembershipId, boolean isFavorite) {
-        ClassroomMembership membership = getClassroomMembership(classroomMembershipId);
+        ClassroomMembership membership = classroomMembershipAccessService.getClassroomMembership(classroomMembershipId);
         membership.setFavorite(isFavorite);
     }
 
@@ -60,7 +61,7 @@ public class ClassroomMembershipService {
      */
     @Transactional
     public void updateHidden(String classroomMembershipId, boolean isHidden) {
-        ClassroomMembership membership = getClassroomMembership(classroomMembershipId);
+        ClassroomMembership membership = classroomMembershipAccessService.getClassroomMembership(classroomMembershipId);
         membership.setHidden(isHidden);
     }
 
@@ -71,7 +72,7 @@ public class ClassroomMembershipService {
      */
     @Transactional
     public NameClassroomResponse leaveClassroom(String classroomMembershipId) {
-        ClassroomMembership membership = getClassroomMembership(classroomMembershipId);
+        ClassroomMembership membership = classroomMembershipAccessService.getClassroomMembership(classroomMembershipId);
         membership.setLeave(false);
 
         return new NameClassroomResponse(membership.getClassroom().getName());
@@ -114,7 +115,7 @@ public class ClassroomMembershipService {
                 throw new ConflictException("Вы уже состоите в этом классе");
             }
         } else {
-            Role studentRole = roleRepository.findByCode(STUDENT_ROLE_CODE)
+            Role studentRole = roleRepository.findByCode(RoleCode.STUDENT.getCode())
                     .orElseThrow(() -> new IllegalStateException(
                             "Роль STUDENT не найдена"
                     ));
@@ -131,46 +132,5 @@ public class ClassroomMembershipService {
         }
 
         return new NameClassroomResponse(classroom.getName());
-    }
-
-    /**
-     * Получает членство пользователя в учебном классе и проверяет права доступа.
-     * @param classroomMembershipId идентификатор членства в учебном классе
-     * @return членство пользователя в учебном классе
-     * @throws NotFoundException если членство не найдено
-     * @throws ForbiddenException если членство принадлежит другому пользователю,
-     * пользователь заблокирован или покинул учебный класс
-     * @throws IllegalStateException если авторизованный пользователь не найден
-     */
-    public ClassroomMembership getClassroomMembership(String classroomMembershipId) {
-        ClassroomMembership membership = classroomMembershipRepository.findById(classroomMembershipId)
-                .orElseThrow(() -> new NotFoundException(
-                        "Данный класс не найден"
-                ));
-
-        User currentUser = userService.getCurrentUser()
-                .orElseThrow(() -> new UserNotFoundException(
-                        "Авторизованный пользователь не найден"
-                ));
-
-        if (!membership.getUser().equals(currentUser)) {
-            throw new ForbiddenException(
-                    "У вас нет доступа к этому учебному классу"
-            );
-        }
-
-        if (membership.isBlocked()) {
-            throw new ForbiddenException(
-                    "Вы заблокированы в этом учебном классе"
-            );
-        }
-
-        if (membership.isLeave()) {
-            throw new ForbiddenException(
-                    "Вы не состоите в данном классе"
-            );
-        }
-
-        return membership;
     }
 }
