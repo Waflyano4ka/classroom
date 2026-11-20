@@ -30,7 +30,7 @@ async function submit() {
 
   loading.value = true
   try {
-    const response = await  api.post(API_PATHS.CLASSROOM_MEMBERSHIPS.JOIN, {
+    const response = await api.post(API_PATHS.CLASSROOM_MEMBERSHIPS.JOIN, {
       inviteCode: form.value.inviteCode
     })
 

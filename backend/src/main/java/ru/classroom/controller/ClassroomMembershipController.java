@@ -4,8 +4,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.classroom.dto.classroommembership.JoinClassroomRequest;
-import ru.classroom.dto.classroommembership.JoinClassroomResponse;
+import ru.classroom.dto.classroommembership.NameClassroomResponse;
 import ru.classroom.dto.classroommembership.UpdateMembershipFavoriteRequest;
+import ru.classroom.dto.classroommembership.UpdateMembershipHiddenRequest;
 import ru.classroom.service.classroom.ClassroomMembershipService;
 
 @RestController
@@ -34,12 +35,41 @@ public class ClassroomMembershipController {
     }
 
     /**
+     * Обновляет признак скрытия класса для участника.
+     * @param classroomMembershipId идентификатор членства в классе
+     * @param request данные для обновления признака скрытия
+     * @return ответ без содержимого
+     */
+    @PatchMapping("/{classroomMembershipId}/hide")
+    public ResponseEntity<Void> hideClassroom(
+            @PathVariable String classroomMembershipId,
+            @Valid @RequestBody UpdateMembershipHiddenRequest request
+    ) {
+        classroomMembershipService.updateHidden(classroomMembershipId, request.getHidden());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Выполняет выход участника из класса.
+     * @param classroomMembershipId идентификатор членства в классе
+     * @return название класса, из которого вышел участник
+     */
+    @PatchMapping("/{classroomMembershipId}/leave")
+    public ResponseEntity<NameClassroomResponse> leaveClassroom(
+            @PathVariable String classroomMembershipId
+    ) {
+        return ResponseEntity.ok(
+                classroomMembershipService.leaveClassroom(classroomMembershipId)
+        );
+    }
+
+    /**
      * Подключает текущего пользователя к классу по коду приглашения.
      * @param request данные для подключения к классу
      * @return информация о подключённом классе
      */
     @PostMapping("/join")
-    public ResponseEntity<JoinClassroomResponse> joinClassroom(@Valid @RequestBody JoinClassroomRequest request){
+    public ResponseEntity<NameClassroomResponse> joinClassroom(@Valid @RequestBody JoinClassroomRequest request){
         return ResponseEntity.ok(
                 classroomMembershipService.joinClassroom(request.getInviteCode())
         );

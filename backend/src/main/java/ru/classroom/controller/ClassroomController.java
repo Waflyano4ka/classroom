@@ -11,6 +11,7 @@ import ru.classroom.dto.classroom.ClassroomCardResponse;
 import ru.classroom.dto.classroom.ClassroomColorResponse;
 import ru.classroom.dto.classroom.CreateClassroomRequest;
 import ru.classroom.dto.classroom.InviteCodeResponse;
+import ru.classroom.dto.classroommembership.NameClassroomResponse;
 import ru.classroom.service.classroom.ClassroomColorService;
 import ru.classroom.service.classroom.ClassroomService;
 
@@ -59,7 +60,7 @@ public class ClassroomController {
      */
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ClassroomCardResponse> createClassroom(@Valid @RequestBody CreateClassroomRequest request) {
+    public ResponseEntity<NameClassroomResponse> createClassroom(@Valid @RequestBody CreateClassroomRequest request) {
         return ResponseEntity.ok(
                 classroomService.createClassroom(request)
         );

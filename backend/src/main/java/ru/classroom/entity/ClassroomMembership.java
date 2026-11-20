@@ -97,6 +97,10 @@ public class ClassroomMembership {
         return hidden;
     }
 
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
     public boolean isBlocked() {
         return blocked;
     }

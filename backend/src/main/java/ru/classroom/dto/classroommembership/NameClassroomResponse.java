@@ -1,10 +1,10 @@
 package ru.classroom.dto.classroommembership;
 
-public class JoinClassroomResponse {
+public class NameClassroomResponse {
 
     private final String name;
 
-    public JoinClassroomResponse(String name) {
+    public NameClassroomResponse(String name) {
         this.name = name;
     }
 

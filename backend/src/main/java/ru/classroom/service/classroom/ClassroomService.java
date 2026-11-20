@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.classroom.dto.ClassroomWithCreatorProjection;
 import ru.classroom.dto.classroom.ClassroomCardResponse;
 import ru.classroom.dto.classroom.CreateClassroomRequest;
+import ru.classroom.dto.classroommembership.NameClassroomResponse;
 import ru.classroom.entity.*;
 import ru.classroom.exception.ConflictException;
 import ru.classroom.exception.UserNotFoundException;
@@ -63,7 +64,7 @@ public class ClassroomService {
      * @throws ConflictException         Код приглашения уже используется
      */
     @Transactional
-    public ClassroomCardResponse createClassroom(CreateClassroomRequest request) {
+    public NameClassroomResponse createClassroom(CreateClassroomRequest request) {
         User user = userService.getCurrentUser()
                 .orElseThrow(() -> new UserNotFoundException(
                         "Авторизованный пользователь не найден"
@@ -104,10 +105,7 @@ public class ClassroomService {
                 creatorRole
         );
 
-        return toClassroomCardResponse(new ClassroomWithCreatorProjection(
-                classroomMembershipRepository.save(membership),
-                user
-        ));
+        return new NameClassroomResponse(savedClassroom.getName());
     }
 
     /**

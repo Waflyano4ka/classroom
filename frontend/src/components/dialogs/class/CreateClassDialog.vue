@@ -96,13 +96,17 @@ async function submit() {
 
   loading.value = true
   try {
-    await api.post(API_PATHS.CLASSROOMS.CREATE, {
+    const response = await api.post(API_PATHS.CLASSROOMS.CREATE, {
       name: form.value.name.trim(),
       colorId: form.value.color.id,
       inviteCode: form.value.code,
     })
 
-    showSnackbar?.(MESSAGES.CLASSROOM.CREATE_SUCCESS, 'success')
+    showSnackbar?.(
+      `${MESSAGES.CLASSROOM.CREATE_SUCCESS} «${response.data.name}»`,
+      'success'
+    )
+
     emit('created')
     dialog.value = false
   } catch (error) {

@@ -2,7 +2,7 @@ package ru.classroom.service.classroom;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.classroom.dto.classroommembership.JoinClassroomResponse;
+import ru.classroom.dto.classroommembership.NameClassroomResponse;
 import ru.classroom.entity.Classroom;
 import ru.classroom.entity.ClassroomMembership;
 import ru.classroom.entity.Role;
@@ -54,12 +54,36 @@ public class ClassroomMembershipService {
     }
 
     /**
+     * Обновляет признак скрытия класса для участника.
+     * @param classroomMembershipId идентификатор членства в классе
+     * @param isHidden признак скрытия класса
+     */
+    @Transactional
+    public void updateHidden(String classroomMembershipId, boolean isHidden) {
+        ClassroomMembership membership = getClassroomMembership(classroomMembershipId);
+        membership.setHidden(isHidden);
+    }
+
+    /**
+     * Выполняет выход участника из класса.
+     * @param classroomMembershipId идентификатор членства в классе
+     * @return название класса, из которого вышел участник
+     */
+    @Transactional
+    public NameClassroomResponse leaveClassroom(String classroomMembershipId) {
+        ClassroomMembership membership = getClassroomMembership(classroomMembershipId);
+        membership.setLeave(false);
+
+        return new NameClassroomResponse(membership.getClassroom().getName());
+    }
+
+    /**
      * Подключает текущего пользователя к классу по коду приглашения.
      * @param inviteCode код для подключения к классу
      * @return информация о подключённом классе
      */
     @Transactional
-    public JoinClassroomResponse joinClassroom(String inviteCode) {
+    public NameClassroomResponse joinClassroom(String inviteCode) {
         User user = userService.getCurrentUser()
                 .orElseThrow(() -> new UserNotFoundException(
                         "Авторизованный пользователь не найден"
@@ -106,7 +130,7 @@ public class ClassroomMembershipService {
             classroomMembershipRepository.save(newMembership);
         }
 
-        return new JoinClassroomResponse(classroom.getName());
+        return new NameClassroomResponse(classroom.getName());
     }
 
     /**
