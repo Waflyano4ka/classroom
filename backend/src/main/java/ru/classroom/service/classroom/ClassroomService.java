@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.classroom.dto.ClassroomWithCreatorProjection;
@@ -31,6 +32,7 @@ public class ClassroomService {
 
     private final ClassroomColorRepository classroomColorRepository;
     private final ClassroomMembershipRepository classroomMembershipRepository;
+    private final ClassroomMembershipService classroomMembershipService;
     private final ClassroomRepository classroomRepository;
     private final RoleRepository roleRepository;
     private final UserService userService;
@@ -40,6 +42,7 @@ public class ClassroomService {
     public ClassroomService(
             ClassroomColorRepository classroomColorRepository,
             ClassroomMembershipRepository classroomMembershipRepository,
+            ClassroomMembershipService classroomMembershipService,
             ClassroomRepository classroomRepository,
             RoleRepository roleRepository,
             UserService userService,
@@ -48,6 +51,7 @@ public class ClassroomService {
     ) {
         this.classroomColorRepository = classroomColorRepository;
         this.classroomMembershipRepository = classroomMembershipRepository;
+        this.classroomMembershipService = classroomMembershipService;
         this.classroomRepository = classroomRepository;
         this.roleRepository = roleRepository;
         this.userService = userService;
@@ -177,6 +181,26 @@ public class ClassroomService {
         } while (classroomMembershipRepository.existsById(classroomMembershipId));
 
         return classroomMembershipId;
+    }
+
+    /**
+     * Обновляет статус архивации класса.
+     * @param classroomMembershipId идентификатор членства в классе
+     * @param isArchived признак архивации класса
+     * @return название класса
+     * @throws AccessDeniedException если участник не является создателем класса
+     */
+    @Transactional
+    public NameClassroomResponse updateArchiveClassroom(String classroomMembershipId, boolean isArchived) {
+        ClassroomMembership membership = classroomMembershipService.getClassroomMembership(classroomMembershipId);
+        if (!CREATOR_ROLE_CODE.equals(membership.getRole().getCode())) {
+            throw new AccessDeniedException("Недостаточно прав для выполнения операции");
+        }
+
+        Classroom classroom = membership.getClassroom();
+        classroom.setArchived(isArchived);
+
+        return new NameClassroomResponse(classroom.getName());
     }
 
     /**

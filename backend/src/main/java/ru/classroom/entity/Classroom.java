@@ -79,4 +79,8 @@ public class Classroom {
     public boolean isArchived() {
         return archived;
     }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
+    }
 }

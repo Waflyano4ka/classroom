@@ -142,7 +142,7 @@ public class ClassroomMembershipService {
      * пользователь заблокирован или покинул учебный класс
      * @throws IllegalStateException если авторизованный пользователь не найден
      */
-    private ClassroomMembership getClassroomMembership(String classroomMembershipId) {
+    public ClassroomMembership getClassroomMembership(String classroomMembershipId) {
         ClassroomMembership membership = classroomMembershipRepository.findById(classroomMembershipId)
                 .orElseThrow(() -> new NotFoundException(
                         "Данный класс не найден"

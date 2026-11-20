@@ -12,7 +12,9 @@ import ru.classroom.dto.classroom.ClassroomColorResponse;
 import ru.classroom.dto.classroom.CreateClassroomRequest;
 import ru.classroom.dto.classroom.InviteCodeResponse;
 import ru.classroom.dto.classroommembership.NameClassroomResponse;
+import ru.classroom.entity.ClassroomMembership;
 import ru.classroom.service.classroom.ClassroomColorService;
+import ru.classroom.service.classroom.ClassroomMembershipService;
 import ru.classroom.service.classroom.ClassroomService;
 
 import java.util.List;
@@ -24,7 +26,10 @@ public class ClassroomController {
     private final ClassroomColorService classroomColorService;
     private final ClassroomService classroomService;
 
-    public ClassroomController(ClassroomColorService classroomColorService, ClassroomService classroomService) {
+    public ClassroomController(
+            ClassroomColorService classroomColorService,
+            ClassroomService classroomService
+    ) {
         this.classroomColorService = classroomColorService;
         this.classroomService = classroomService;
     }
@@ -63,6 +68,34 @@ public class ClassroomController {
     public ResponseEntity<NameClassroomResponse> createClassroom(@Valid @RequestBody CreateClassroomRequest request) {
         return ResponseEntity.ok(
                 classroomService.createClassroom(request)
+        );
+    }
+
+    /**
+     * Архивирует класс.
+     * @param classroomMembershipId идентификатор членства в классе
+     * @return название архивированного класса
+     */
+    @PatchMapping("/{classroomMembershipId}/archive")
+    public ResponseEntity<NameClassroomResponse> archiveClassroom(
+            @PathVariable String classroomMembershipId
+    ) {
+        return ResponseEntity.ok(
+                classroomService.updateArchiveClassroom(classroomMembershipId, true)
+        );
+    }
+
+    /**
+     * Восстанавливает класс из архива.
+     * @param classroomMembershipId идентификатор членства в классе
+     * @return название восстановленного класса
+     */
+    @PatchMapping("/{classroomMembershipId}/unarchive")
+    public ResponseEntity<NameClassroomResponse> unarchiveClassroom(
+            @PathVariable String classroomMembershipId
+    ) {
+        return ResponseEntity.ok(
+                classroomService.updateArchiveClassroom(classroomMembershipId, false)
         );
     }
 

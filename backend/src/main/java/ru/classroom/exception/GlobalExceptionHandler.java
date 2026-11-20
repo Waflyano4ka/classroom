@@ -3,6 +3,7 @@ package ru.classroom.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -69,6 +70,15 @@ public class GlobalExceptionHandler {
     public ApiError handleForbiddenException(ForbiddenException exception) {
         return new ApiError(
                 "ERR-403-001",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleAccessDeniedException(AccessDeniedException exception) {
+        return new ApiError(
+                "ERR-403-002",
                 exception.getMessage()
         );
     }
