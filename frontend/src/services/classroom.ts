@@ -53,3 +53,13 @@ export const updateClassroomFavorite = (
     { favorite }
   )
 }
+
+export const updateClassroomHidden = (
+  classroomMembershipId: string,
+  hidden: boolean
+)=> {
+  return api.patch(
+    `${API_PATHS.CLASSROOM_MEMBERSHIPS.BASE}/${classroomMembershipId}/hide`,
+    { hidden }
+  )
+}

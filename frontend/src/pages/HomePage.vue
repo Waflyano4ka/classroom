@@ -134,6 +134,7 @@ onMounted(() => {
           v-for="item in classrooms"
           :key="item.memberId"
           :item="item"
+          @onHidden="loadClassrooms"
         />
       </div>
 

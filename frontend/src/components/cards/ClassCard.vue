@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import {computed, inject, ref} from 'vue'
 import ClassroomAvatarCard from "../avatrs/ClassroomAvatarCard.vue"
-import { updateClassroomFavorite } from '@/services/classroom'
+import { updateClassroomFavorite, updateClassroomHidden } from '@/services/classroom'
 import { isCreator } from '@/constants/roles'
 import axios from "axios";
 import { MESSAGES } from "@/constants/messages.ts";
 
 import type { ClassroomCardResponse } from "@/services/classroom.ts";
 import type { SnackbarType } from "@/types/Snackbar.ts";
+
+const emit = defineEmits<{
+  onHidden: [],
+  onLeave: []
+}>()
 
 const props = defineProps<{
   item: ClassroomCardResponse
@@ -26,7 +31,10 @@ const textColor = computed(() => {
 })
 
 const isFavorite = ref(props.item.favorite)
+const isHidden = ref(props.item.hidden)
 const loadingFavorite = ref(false)
+const loadingHide = ref(false)
+const loadingLeave = ref(false)
 
 const subtitle = computed(() => {
   const parts = [
@@ -66,6 +74,49 @@ async function onToggleFavorite() {
     }
   } finally {
     loadingFavorite.value = false
+  }
+}
+
+async function onHide() {
+  if (loadingHide.value) return
+
+  loadingHide.value = true
+  const nextValue = !isHidden.value
+
+  try {
+    await updateClassroomHidden(props.item.memberId, nextValue)
+    emit('onHidden')
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      showSnackbar?.(
+        error.response?.data?.message ?? MESSAGES.CLASSROOM_MEMBERSHIP.HIDDEN_ERROR, 'error'
+      )
+    } else {
+      showSnackbar?.(MESSAGES.CLASSROOM_MEMBERSHIP.HIDDEN_ERROR, 'error')
+    }
+  } finally {
+    loadingHide.value = false
+  }
+}
+
+async function onLeave() {
+  if (loadingLeave.value) return
+
+  loadingLeave.value = true
+
+  try {
+    await leaveClassroom(props.item.memberId)
+    emit('onLeave')
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      showSnackbar?.(
+        error.response?.data?.message ?? MESSAGES.CLASSROOM_MEMBERSHIP.LEAVE_ERROR, 'error'
+      )
+    } else {
+      showSnackbar?.(MESSAGES.CLASSROOM_MEMBERSHIP.LEAVE_ERROR, 'error')
+    }
+  } finally {
+    loadingLeave.value = false
   }
 }
 </script>

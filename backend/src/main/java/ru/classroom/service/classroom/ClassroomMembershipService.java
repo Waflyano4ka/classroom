@@ -72,7 +72,7 @@ public class ClassroomMembershipService {
      */
     @Transactional
     public NameClassroomResponse leaveClassroom(String classroomMembershipId) {
-        ClassroomMembership membership = classroomMembershipAccessService.getClassroomMembership(classroomMembershipId);
+        ClassroomMembership membership = classroomMembershipAccessService.getClassroomMembershipNotCreator(classroomMembershipId);
         membership.setLeave(false);
 
         return new NameClassroomResponse(membership.getClassroom().getName());

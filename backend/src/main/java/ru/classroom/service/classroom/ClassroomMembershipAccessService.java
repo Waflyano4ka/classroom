@@ -2,6 +2,7 @@ package ru.classroom.service.classroom;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import ru.classroom.constant.RoleCode;
 import ru.classroom.entity.ClassroomMembership;
 import ru.classroom.entity.User;
 import ru.classroom.exception.ForbiddenException;
@@ -65,10 +66,32 @@ public class ClassroomMembershipAccessService {
         return membership;
     }
 
+    /**
+     * Получает членство в классе и проверяет соответствие роли указанному коду.
+     * @param classroomMembershipId идентификатор членства в классе
+     * @param roleCode код требуемой роли
+     * @return членство в классе
+     * @throws AccessDeniedException если роль участника не соответствует требуемой
+     */
     public ClassroomMembership getClassroomMembershipRole(String classroomMembershipId, String roleCode) {
         ClassroomMembership membership = getClassroomMembership(classroomMembershipId);
         if (!roleCode.equals(membership.getRole().getCode())) {
             throw new AccessDeniedException("Недостаточно прав для выполнения операции");
+        }
+
+        return membership;
+    }
+
+    /**
+     * Получает членство в классе, проверяя, что участник не является его создателем.
+     * @param classroomMembershipId идентификатор членства в классе
+     * @return членство в классе
+     * @throws ForbiddenException если участник является создателем класса
+     */
+    public ClassroomMembership getClassroomMembershipNotCreator(String classroomMembershipId) {
+        ClassroomMembership membership = getClassroomMembership(classroomMembershipId);
+        if (RoleCode.CREATOR.getCode().equals(membership.getRole().getCode())) {
+            throw new ForbiddenException("Создатель класса не может покинуть его");
         }
 
         return membership;

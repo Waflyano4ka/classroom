@@ -22,6 +22,8 @@ export const MESSAGES = {
   },
   CLASSROOM_MEMBERSHIP: {
     FAVOURITE_ERROR: 'Не удалось добавить класс в избранные',
+    HIDDEN_ERROR: 'Не удалось скрыть класс',
+    LEAVE_ERROR: 'Не удалось покинуть класс',
     JOIN_ERROR: 'Не удалось подключиться к классу',
     JOIN_SUCCESS: 'Вы успешно подключились к классу',
   }

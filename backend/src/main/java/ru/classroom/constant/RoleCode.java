@@ -1,10 +1,5 @@
 package ru.classroom.constant;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
 public enum RoleCode {
 
     CREATOR("CREATOR"),
@@ -12,4 +7,12 @@ public enum RoleCode {
     STUDENT("STUDENT");
 
     private final String code;
+
+    RoleCode(String code) {
+        this.code = code;
+    }
+
+    public String getCode() {
+        return code;
+    }
 }
