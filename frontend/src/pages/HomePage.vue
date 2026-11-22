@@ -135,6 +135,8 @@ onMounted(() => {
           :key="item.memberId"
           :item="item"
           @onHidden="loadClassrooms"
+          @onLeave="loadClassrooms"
+          @onArchive="loadClassrooms"
         />
       </div>
 

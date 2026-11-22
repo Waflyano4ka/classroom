@@ -1,17 +1,24 @@
 <script setup lang="ts">
 import {computed, inject, ref} from 'vue'
 import ClassroomAvatarCard from "../avatrs/ClassroomAvatarCard.vue"
-import { updateClassroomFavorite, updateClassroomHidden } from '@/services/classroom'
+import {
+  unarchiveClassroom,
+  updateClassroomFavorite,
+  updateClassroomHidden
+} from '@/services/classroom'
 import { isCreator } from '@/constants/roles'
 import axios from "axios";
 import { MESSAGES } from "@/constants/messages.ts";
 
 import type { ClassroomCardResponse } from "@/services/classroom.ts";
 import type { SnackbarType } from "@/types/Snackbar.ts";
+import ConfirmLeaveDialog from "@/components/dialogs/class/ConfirmLeaveDialog.vue";
+import ConfirmArchiveDialog from "@/components/dialogs/class/ConfirmArchiveDialog.vue";
 
 const emit = defineEmits<{
   onHidden: [],
-  onLeave: []
+  onLeave: [],
+  onArchive: []
 }>()
 
 const props = defineProps<{
@@ -34,7 +41,7 @@ const isFavorite = ref(props.item.favorite)
 const isHidden = ref(props.item.hidden)
 const loadingFavorite = ref(false)
 const loadingHide = ref(false)
-const loadingLeave = ref(false)
+const loadingUnarchive = ref(false)
 
 const subtitle = computed(() => {
   const parts = [
@@ -99,24 +106,28 @@ async function onHide() {
   }
 }
 
-async function onLeave() {
-  if (loadingLeave.value) return
-
-  loadingLeave.value = true
+async function onUnarchive() {
+  loadingUnarchive.value = true
 
   try {
-    await leaveClassroom(props.item.memberId)
-    emit('onLeave')
+    const response = await unarchiveClassroom(props.item.memberId)
+
+    showSnackbar?.(
+      `${MESSAGES.CLASSROOM.UNARCHIVE_SUCCESS} «${response.data.name}»`,
+      'success'
+    )
+
+    emit('onArchive')
   } catch (error) {
     if (axios.isAxiosError(error)) {
       showSnackbar?.(
-        error.response?.data?.message ?? MESSAGES.CLASSROOM_MEMBERSHIP.LEAVE_ERROR, 'error'
+        error.response?.data?.message ?? MESSAGES.CLASSROOM.UNARCHIVE_ERROR, 'error'
       )
     } else {
-      showSnackbar?.(MESSAGES.CLASSROOM_MEMBERSHIP.LEAVE_ERROR, 'error')
+      showSnackbar?.(MESSAGES.CLASSROOM.UNARCHIVE_ERROR, 'error')
     }
   } finally {
-    loadingLeave.value = false
+    loadingUnarchive.value = false
   }
 }
 </script>
@@ -204,19 +215,25 @@ async function onLeave() {
             :prepend-icon="item.hidden ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
             @click="onHide"
           />
-          <v-list-item
-            v-if="isCreator(item.permissions)"
-            :title="item.archived ? 'Разархивировать' : 'Архивировать'"
-            :prepend-icon="item.archived ? 'mdi-archive-arrow-up-outline' : 'mdi-archive-outline'"
-            class="text-error"
-            @click="onArchive"
-          />
-          <v-list-item
+          <template v-if="isCreator(item.permissions)">
+            <confirm-archive-dialog
+              v-if="!item.archived"
+              :member-id="item.memberId"
+              :archived="item.archived"
+              @onArchive="emit('onArchive')"
+            />
+            <v-list-item
+              v-else
+              title="Разархивировать"
+              prepend-icon="mdi-archive-arrow-up-outline"
+              class="text-error"
+              @click="onUnarchive"
+            />
+          </template>
+          <confirm-leave-dialog
             v-else
-            title="Покинуть"
-            prepend-icon="mdi-exit-to-app"
-            class="text-error"
-            @click="onLeave"
+            :member-id="item.memberId"
+            @onLeave="emit('onLeave')"
           />
         </v-list>
       </v-menu>

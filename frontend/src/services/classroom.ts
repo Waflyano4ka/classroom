@@ -63,3 +63,27 @@ export const updateClassroomHidden = (
     { hidden }
   )
 }
+
+export const leaveClassroom = (
+  classroomMembershipId: string
+)=> {
+  return api.patch(
+    `${API_PATHS.CLASSROOM_MEMBERSHIPS.BASE}/${classroomMembershipId}/leave`
+  )
+}
+
+export const archiveClassroom = (
+  classroomMembershipId: string
+)=> {
+  return api.patch(
+    `${API_PATHS.CLASSROOMS.BASE}/${classroomMembershipId}/archive`
+  )
+}
+
+export const unarchiveClassroom = (
+  classroomMembershipId: string
+)=> {
+  return api.patch(
+    `${API_PATHS.CLASSROOMS.BASE}/${classroomMembershipId}/unarchive`
+  )
+}

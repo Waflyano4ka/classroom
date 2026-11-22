@@ -18,12 +18,17 @@ export const MESSAGES = {
     CREATE_SUCCESS: 'Создан новый класс',
     CREATE_ERROR: 'Не удалось создать класс',
     COLORS_ERROR: 'Не удалось загрузить цвета',
-    GENERATE_INVITE_ERROR: 'Не удалось сгенерировать код'
+    GENERATE_INVITE_ERROR: 'Не удалось сгенерировать код',
+    ARCHIVE_ERROR: 'Не удалось архивировать класс',
+    ARCHIVE_SUCCESS: 'Архивирован класс',
+    UNARCHIVE_ERROR: 'Не удалось разархивировать класс',
+    UNARCHIVE_SUCCESS: 'Разархивирован класс',
   },
   CLASSROOM_MEMBERSHIP: {
     FAVOURITE_ERROR: 'Не удалось добавить класс в избранные',
     HIDDEN_ERROR: 'Не удалось скрыть класс',
     LEAVE_ERROR: 'Не удалось покинуть класс',
+    LEAVE_SUCCESS: 'Вы покинули класс',
     JOIN_ERROR: 'Не удалось подключиться к классу',
     JOIN_SUCCESS: 'Вы успешно подключились к классу',
   }
