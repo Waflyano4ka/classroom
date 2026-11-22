@@ -3,6 +3,7 @@ import { API_PATHS } from '@/constants/apiPaths.ts'
 
 export interface ClassroomCardResponse {
   memberId: string
+  classId: string
   name: string
   colorHexCode: string
   textHexCode: string

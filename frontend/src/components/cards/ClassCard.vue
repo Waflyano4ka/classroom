@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import {computed, inject, ref} from 'vue'
+import { computed, inject, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import ClassroomAvatarCard from "../avatrs/ClassroomAvatarCard.vue"
 import {
   unarchiveClassroom,
@@ -130,6 +131,17 @@ async function onUnarchive() {
     loadingUnarchive.value = false
   }
 }
+
+const router = useRouter()
+
+function openClassroom() {
+  router.push({
+    name: 'classroom',
+    params: {
+      classroomId: props.item.classId,
+    },
+  })
+}
 </script>
 
 <template>
@@ -144,8 +156,9 @@ async function onUnarchive() {
       :class="{ 'is-hidden': item.hidden }"
     >
       <v-card-title
-        class="text-h6 font-weight-medium pa-0 text-truncate pe-16"
+        class="text-h6 font-weight-medium pa-0 text-truncate pe-16 classroom-title"
         :style="{ color: textColor }"
+        @click.stop="openClassroom"
       >
         {{ item.name }}
       </v-card-title>
@@ -277,5 +290,13 @@ async function onUnarchive() {
   min-height: 36px;
   padding-top: 0;
   padding-bottom: 0;
+}
+
+.classroom-title {
+  cursor: pointer;
+}
+
+.classroom-title:hover {
+  text-decoration: underline;
 }
 </style>

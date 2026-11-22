@@ -9,6 +9,7 @@ import WelcomePage from '@/pages/WelcomePage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
 import RegistrationPage from '@/pages/RegistrationPage.vue'
 import HomePage from '@/pages/HomePage.vue'
+import ClassroomPage from "@/pages/ClassroomPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,6 +49,24 @@ const router = createRouter({
           path: '',
           name: 'home',
           component: HomePage,
+        },
+      ],
+    },
+    {
+      path: '/classrooms',
+      component: HomeLayout,
+      meta: {
+        requiresAuth: true,
+      },
+      children: [
+        {
+          path: '',
+          redirect: { name: 'home' },
+        },
+        {
+          path: ':classroomId',
+          name: 'classroom',
+          component: ClassroomPage,
         },
       ],
     },

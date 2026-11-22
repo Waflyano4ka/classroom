@@ -3,6 +3,7 @@ package ru.classroom.dto.classroom;
 public class ClassroomCardResponse {
 
     private final String memberId;
+    private final String classId;
     private final String name;
     private final String colorHexCode;
     private final String textHexCode;
@@ -17,6 +18,7 @@ public class ClassroomCardResponse {
 
     public ClassroomCardResponse(
             String memberId,
+            String classId,
             String name,
             String colorHexCode,
             String textHexCode,
@@ -30,6 +32,7 @@ public class ClassroomCardResponse {
             boolean archived
     ) {
         this.memberId = memberId;
+        this.classId = classId;
         this.name = name;
         this.colorHexCode = colorHexCode;
         this.textHexCode = textHexCode;
@@ -45,6 +48,10 @@ public class ClassroomCardResponse {
 
     public String getMemberId() {
         return memberId;
+    }
+
+    public String getClassId() {
+        return classId;
     }
 
     public String getName() {

@@ -215,6 +215,7 @@ public class ClassroomService {
         User creator = classroomWithCreatorProjection.getCreator();
         return new ClassroomCardResponse(
                 membership.getId(),
+                classroom.getId(),
                 classroom.getName(),
                 classroom.getColor().getHexCode(),
                 classroom.getColor().getTextHexCode(),
