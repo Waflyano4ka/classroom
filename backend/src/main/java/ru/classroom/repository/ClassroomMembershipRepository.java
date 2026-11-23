@@ -31,6 +31,7 @@ public interface ClassroomMembershipRepository extends JpaRepository<ClassroomMe
               AND (:isMyProject = false OR cm.role.code = :creatorRoleCode)
               AND (:isHidden = true OR cm.hidden = false)
               AND (cm.leave = :isLeave)
+              AND (cm.blocked = :isBlocked)
               AND (
                   :search = ''
                   OR LOWER(cm.classroom.name) LIKE LOWER(CONCAT('%', :search, '%'))
@@ -42,8 +43,36 @@ public interface ClassroomMembershipRepository extends JpaRepository<ClassroomMe
             @Param("isMyProject") boolean isMyProject,
             @Param("creatorRoleCode") String creatorRoleCode,
             @Param("isLeave") boolean isLeave,
+            @Param("isBlocked") boolean isBlocked,
             @Param("search") String search,
             Pageable pageable
+    );
+
+    @EntityGraph(attributePaths = {
+            "classroom",
+            "classroom.color",
+            "user",
+            "role"
+    })
+    @Query("""
+        SELECT new ru.classroom.dto.ClassroomWithCreatorProjection(cm, creatorUser)
+        FROM ClassroomMembership cm
+        JOIN cm.classroom c
+        LEFT JOIN ClassroomMembership creatorCm
+          ON creatorCm.classroom = c
+            AND creatorCm.role.code = :creatorRoleCode
+        LEFT JOIN creatorCm.user creatorUser
+        WHERE c.id = :classroomId
+          AND cm.user.id = :userId
+          AND (cm.leave = :isLeave)
+          AND (cm.blocked = :isBlocked)
+        """)
+    Optional<ClassroomWithCreatorProjection> findByClassroomIdAndUserId(
+            @Param("classroomId") String classroomId,
+            @Param("userId") String userId,
+            @Param("creatorRoleCode") String creatorRoleCode,
+            @Param("isLeave") boolean isLeave,
+            @Param("isBlocked") boolean isBlocked
     );
 
     Optional<ClassroomMembership> findByClassroomIdAndUserId(String classroomId, String userId);

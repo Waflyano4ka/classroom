@@ -12,9 +12,11 @@ import ru.classroom.constant.RoleCode;
 import ru.classroom.dto.ClassroomWithCreatorProjection;
 import ru.classroom.dto.classroom.ClassroomCardResponse;
 import ru.classroom.dto.classroom.CreateClassroomRequest;
+import ru.classroom.dto.classroom.DetailedClassroomResponse;
 import ru.classroom.dto.classroommembership.NameClassroomResponse;
 import ru.classroom.entity.*;
 import ru.classroom.exception.ConflictException;
+import ru.classroom.exception.NotFoundException;
 import ru.classroom.exception.UserNotFoundException;
 import ru.classroom.repository.ClassroomColorRepository;
 import ru.classroom.repository.ClassroomMembershipRepository;
@@ -150,10 +152,38 @@ public class ClassroomService {
                         isMyProjects,
                         RoleCode.CREATOR.getCode(),
                         false,
+                        false,
                         normalizedSearch,
                         pageable
                 )
                 .map(this::toClassroomCardResponse);
+    }
+
+    /**
+     * Получает подробную информацию о классе для текущего пользователя.
+     * @param classroomId идентификатор класса
+     * @return подробная информация о классе
+     * @throws UserNotFoundException если авторизованный пользователь не найден
+     * @throws NotFoundException если класс не найден или пользователь не является его участником
+     */
+    @Transactional(readOnly = true)
+    public DetailedClassroomResponse getDetailedClassroom(String classroomId) {
+        User user = userService.getCurrentUser()
+                .orElseThrow(() -> new UserNotFoundException(
+                        "Авторизованный пользователь не найден"
+                ));
+
+        return classroomMembershipRepository.findByClassroomIdAndUserId(
+                        classroomId,
+                        user.getId(),
+                        RoleCode.CREATOR.getCode(),
+                        false,
+                        false
+                )
+                .map(this::toDetailedClassroomResponse)
+                .orElseThrow(() -> new NotFoundException(
+                        "Класс не найден"
+                ));
     }
 
     /**
@@ -201,6 +231,33 @@ public class ClassroomService {
         classroom.setArchived(isArchived);
 
         return new NameClassroomResponse(classroom.getName());
+    }
+
+    /**
+     * Преобразует сущность класса в DTO класса.
+     * @param classroomWithCreatorProjection сущность участия пользователя в классе и создателя
+     * @return DTO карточки класса
+     */
+    private DetailedClassroomResponse toDetailedClassroomResponse(ClassroomWithCreatorProjection classroomWithCreatorProjection) {
+        ClassroomMembership membership = classroomWithCreatorProjection.getMembership();
+        Classroom classroom = membership.getClassroom();
+        Role role = membership.getRole();
+        User creator = classroomWithCreatorProjection.getCreator();
+        return new DetailedClassroomResponse(
+                membership.getId(),
+                classroom.getName(),
+                classroom.getDescription(),
+                classroom.getColor().getHexCode(),
+                classroom.getColor().getTextHexCode(),
+                role.getCode(),
+                creator.getLastName(),
+                creator.getFirstName(),
+                creator.getMiddleName(),
+                creator.getUsername(),
+                membership.isFavorite(),
+                membership.isHidden(),
+                classroom.isArchived()
+        );
     }
 
     /**

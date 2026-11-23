@@ -15,6 +15,7 @@ export const MESSAGES = {
   },
   CLASSROOM: {
     GET_ERROR: 'Не удалось загрузить классы',
+    GET_DETAILED_ERROR: 'Не удалось загрузить класс',
     CREATE_SUCCESS: 'Создан новый класс',
     CREATE_ERROR: 'Не удалось создать класс',
     COLORS_ERROR: 'Не удалось загрузить цвета',

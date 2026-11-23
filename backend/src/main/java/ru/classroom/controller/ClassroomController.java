@@ -7,10 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.classroom.dto.classroom.ClassroomCardResponse;
-import ru.classroom.dto.classroom.ClassroomColorResponse;
-import ru.classroom.dto.classroom.CreateClassroomRequest;
-import ru.classroom.dto.classroom.InviteCodeResponse;
+import ru.classroom.dto.classroom.*;
 import ru.classroom.dto.classroommembership.NameClassroomResponse;
 import ru.classroom.entity.ClassroomMembership;
 import ru.classroom.service.classroom.ClassroomColorService;
@@ -126,6 +123,18 @@ public class ClassroomController {
     ) {
         return ResponseEntity.ok(
                 classroomService.getClassrooms(page, size, isHidden, isMyProjects, search)
+        );
+    }
+
+    /**
+     * Получает подробную информацию о классе по его идентификатору.
+     * @param classroomId идентификатор класса
+     * @return подробная информация о классе
+     */
+    @GetMapping("/{classroomId}")
+    public ResponseEntity<DetailedClassroomResponse> getDetailedClassroom(@PathVariable String classroomId) {
+        return ResponseEntity.ok(
+                classroomService.getDetailedClassroom(classroomId)
         );
     }
 }
